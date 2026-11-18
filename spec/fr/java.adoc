@@ -23,10 +23,11 @@ Le code qui s’exécute sur Quarkus suit aussi la page xref:quarkus.adoc[Quarku
 |Error Prone |2.52.0 |Repère des motifs de bogues à la compilation.
 |NullAway |0.14.4 |Vérifie la nullabilité.
 |JSpecify |1.0.1 |Annotations de nullabilité.
-|SpotBugs Maven plugin avec Find Security Bugs |4.10.5.0 et 1.14.0 |Repère les bogues et les faiblesses de sécurité dans le code octet.
+|Plugiciel Maven de SpotBugs, avec Find Security Bugs |4.10.5.0 et 1.14.0 |Repère les bogues et les faiblesses de sécurité dans le code octet.
 |ArchUnit |1.5.1 |Teste les règles d’architecture.
+|JUnit Jupiter |6.1.3 |Exécute les tests.
 |Maven Enforcer Plugin |3.7.0 |Vérifie les versions et les dépendances.
-|japicmp Maven plugin |0.27.0 |Compare l’interface publique avec la dernière version publiée.
+|Plugiciel Maven de japicmp |0.27.0 |Compare l’interface publique avec la dernière version publiée.
 |===
 
 == Versions
@@ -36,7 +37,8 @@ Le code qui s’exécute sur Quarkus suit aussi la page xref:quarkus.adoc[Quarku
 Elles DOIVENT se construire et se tester sur Java 25, la version à soutien à long terme.
 L’{abbr-ci-first} DEVRAIT aussi tester sur la plus récente version de fonctionnalités du JDK.
 Cette tâche ne bloque pas une fusion.
-Vérification : la règle `requireJavaVersion` du Maven Enforcer Plugin, et la revue des tâches d’{abbr-ci}.
+Vérification : les règles `requireJavaVersion` et `requireProperty` du Maven Enforcer Plugin, la seconde sur `maven.compiler.release` avec la valeur `21`.
+La revue vérifie les tâches d’{abbr-ci}.
 
 Java 21 est le plancher de Quarkus 4, comme l’indique l’link:https://quarkus.io/blog/quarkus-4-0-0-beta1-released/[annonce de Quarkus 4.0.0.Beta1].
 Java 25 est la version actuelle à soutien à long terme.
@@ -44,7 +46,7 @@ La prochaine révision de cette page examinera la version à long terme suivante
 
 [[COD-101]]
 *COD-101.* Un artefact publié NE DOIT PAS employer une fonctionnalité en préversion de Java.
-Vérification : revue qui confirme qu’aucun fichier de construction ne passe `--enable-preview`.
+Vérification : une recherche de `--enable-preview` dans les fichiers de construction par l’{abbr-ci}.
 
 Un fichier de classe qui emploie des fonctionnalités en préversion ne s’exécute que sur le JDK exact qui l’a compilé.
 Le link:https://openjdk.org/jeps/12[JEP 12] l’explique.
@@ -82,6 +84,7 @@ Vérification : la construction Maven.
 L’outil link:https://github.com/google/error-prone/releases[Error Prone] s’exécute dans le compilateur.
 L’outil link:https://spotbugs.github.io/[SpotBugs] lit le code octet, et link:https://find-sec-bugs.github.io/[Find Security Bugs] y ajoute des détecteurs de sécurité.
 La bibliothèque link:https://www.archunit.org/[ArchUnit] exprime les règles sur les paquets et les classes sous forme de tests unitaires.
+TST-006 laisse le choix de l’outil de test, et les projets Java emploient JUnit Jupiter.
 Les limites sur la longueur des méthodes ou le nombre de paramètres restent des conseils de revue.
 Elles ne font pas échouer la construction.
 
@@ -90,7 +93,7 @@ Elles ne font pas échouer la construction.
 [[COD-105]]
 *COD-105.* Un résultat d’affaires attendu, comme un refus, DOIT être une valeur d’un type scellé.
 L’appelant DOIT le traiter avec un `switch` qui couvre chaque type permis.
-Les exceptions DOIVENT hériter de `RuntimeException`, et NE DOIVENT servir qu’aux bogues et aux pannes de l’infrastructure.
+Les exceptions DOIVENT hériter de `RuntimeException`, et DOIVENT servir uniquement aux bogues et aux pannes de l’infrastructure.
 Le code qui enveloppe une exception DOIT lui passer l’originale comme cause.
 Vérification : revue.
 
@@ -102,7 +105,8 @@ Kotlin suit le même modèle, selon COD-303.
 [[COD-106]]
 *COD-106.* Une méthode NE DOIT PAS renvoyer `null` au lieu d’une collection vide ou d’un `Optional` vide.
 Le code NE DOIT PAS employer la sérialisation Java pour échanger ou stocker des données.
-Vérification : NullAway pour les valeurs de retour, et la revue pour la sérialisation.
+Vérification : NullAway pour les retours `null` dans le code que couvre `@NullMarked`, et Find Security Bugs pour la désérialisation dangereuse.
+La revue couvre le reste.
 
 == Construction
 
@@ -146,7 +150,7 @@ Cette vérification transforme cette promesse en test.
 
 [[COD-111]]
 *COD-111.* Chaque bibliothèque sans fichier `module-info.java` DOIT fixer `Automatic-Module-Name` dans le manifeste de son archive.
-Ce nom DOIT respecter NAM-022.
+Ce nom DEVRAIT respecter NAM-022, qui est elle-même une recommandation.
 Vérification : revue du manifeste de l’archive.
 
 [[COD-112]]
@@ -171,7 +175,7 @@ Le link:https://central.sonatype.org/publish/publish-maven/[guide pour Maven] in
 == Paquets
 
 [[COD-114]]
-*COD-114.* Une bibliothèque d’un composant du secteur public DOIT garder son domaine et ses ports à l’écart de ses adaptateurs.
+*COD-114.* Une bibliothèque de la {abbr-fpsot} DOIT garder son domaine et ses ports à l’écart de ses adaptateurs.
 Leurs paquets NE DOIVENT PAS importer un paquet d’adaptateur.
 Les adaptateurs DOIVENT dépendre des ports, jamais l’inverse.
 Un module d’application PEUT employer des paquets en couches dans ses adaptateurs.
@@ -199,7 +203,7 @@ La page xref:overridable-rules.adoc[Règles substituables] montre comment une ex
 * link:https://hub.quarkiverse.io/checklistfornewprojects/[Checklist for new projects], Quarkiverse. link:https://web.archive.org/web/20250207074542/https://hub.quarkiverse.io/checklistfornewprojects/[Copie archivée]
 * link:https://code.revelc.net/formatter-maven-plugin/[Formatter Maven Plugin], revelc.net, version 2.29.0. link:https://web.archive.org/web/20260809181016/https://code.revelc.net/formatter-maven-plugin/[Copie archivée]
 * link:https://code.revelc.net/impsort-maven-plugin/[ImpSort Maven Plugin], revelc.net, version 1.13.0. link:https://web.archive.org/web/20260809181016/https://code.revelc.net/impsort-maven-plugin/[Copie archivée]
-* link:https://github.com/uber/NullAway/releases[NullAway releases], Uber, version 0.14.4, 2026-11-16. link:https://web.archive.org/web/20260309021407/https://github.com/uber/NullAway/releases[Copie archivée]
+* link:https://github.com/uber/NullAway/releases[NullAway releases], Uber, version 0.14.4, 2026-11-16. link:https://github.com/uber/NullAway/tree/5be6a1d8059c43bd61059faf6097a50b41e5ad8f/[Source à l’archivage de la version]
 * link:https://github.com/google/error-prone/releases[Error Prone releases], Google, version 2.52.0. link:https://web.archive.org/web/20260416032058/https://github.com/google/error-prone/releases[Copie archivée]
 * link:https://spotbugs.github.io/[SpotBugs], projet SpotBugs. link:https://web.archive.org/web/20261104195909/https://spotbugs.github.io/[Copie archivée]
 * link:https://find-sec-bugs.github.io/[Find Security Bugs], version 1.14.0. link:https://web.archive.org/web/20261103042115/https://find-sec-bugs.github.io/[Copie archivée]

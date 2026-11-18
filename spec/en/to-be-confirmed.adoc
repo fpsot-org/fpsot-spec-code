@@ -23,8 +23,10 @@ They cover these topics.
 |11 and 12 |Go functions: named results, and value against pointer receivers.
 |===
 
-Two rules of this specification touch the same topics, but rest on other sources.
+Three rules of this specification touch the same topics.
 COD-112 forbids pooling virtual threads, after JEP 444.
+COD-405 makes a MUST only of what `go vet` and `errorlint` check.
+It keeps the choice between `%w` and `%v` as a SHOULD.
 COD-105 makes Java exceptions unchecked.
 It follows the model of errors that the lead approved for Java and Kotlin together.
 

@@ -41,7 +41,11 @@ Vérification : link:https://github.com/koalaman/shellcheck/releases[ShellCheck]
 *COD-502.* Un script DOIT mettre entre guillemets chaque variable et chaque substitution de commande qu’il développe.
 Il DOIT transmettre les arguments avec `"$@"`, faire ses tests avec `[[ ]]` et capter les sorties avec `$( )`.
 Il NE DOIT PAS employer `eval`.
-Vérification : ShellCheck, et revue pour `eval`.
+Le {term-repository} DOIT archiver à sa racine un fichier `.shellcheckrc` qui contient `enable=require-double-brackets`.
+Vérification : ShellCheck avec ce fichier, et une recherche de `eval` dans chaque script par l’{abbr-ci}.
+
+La vérification facultative `require-double-brackets` de ShellCheck signale chaque test `[ ]` dans un script Bash.
+Le fichier `examples/.shellcheckrc` montre ce réglage.
 
 [[COD-503]]
 *COD-503.* Un script DEVRAIT commencer par `set -Eeuo pipefail` et `shopt -s inherit_errexit`.
@@ -60,11 +64,12 @@ Il NE DOIT PAS employer un chemin fixe pour ses données temporaires.
 Vérification : revue.
 
 [[COD-505]]
-*COD-505.* Un script qui dépasse une centaine de lignes DOIT devenir un programme Go, selon la page xref:go.adoc[Go].
+*COD-505.* Un script de plus de 100 lignes DOIT devenir un programme Go, selon la page xref:go.adoc[Go].
 Un script qui analyse des données structurées, comme du {abbr-json-first} ou du {abbr-xml-first}, DOIT aussi en devenir un.
-Vérification : revue.
+Vérification : un contrôle par l’{abbr-ci} que `wc -l` donne 100 ou moins pour chaque script.
+La revue vérifie l’analyse des données.
 
-Le guide de Google fixe la même limite.
+Le guide de Google fixe une limite d’environ 100 lignes.
 Un programme Go profite des types, des tests et des mêmes analyseurs statiques que les autres outils de la {abbr-fpsot-first}.
 
 [[COD-506]]
@@ -84,7 +89,7 @@ Depuis la version 1.14, la commande `run` de bats respecte `set -e`, ce qui peut
 === Références informatives
 
 * link:https://mywiki.wooledge.org/BashFAQ/105[BashFAQ/105, Why doesn't set -e do what I expected?], Greg's Wiki. link:https://web.archive.org/web/20261113202851/http://mywiki.wooledge.org/BashFAQ/105[Copie archivée]
-* link:https://github.com/bats-core/bats-core/releases[bats-core releases], version 1.14.0, 2026-07-21. link:https://web.archive.org/web/20260515234319/https://github.com/bats-core/bats-core/releases[Copie archivée]
+* link:https://github.com/bats-core/bats-core/releases[bats-core releases], version 1.14.0, 2026-07-21. link:https://github.com/bats-core/bats-core/tree/eb7f42f8d608ac693d7a4b67474f6714ea68cfc5/[Source à l’archivage de la version]
 
 == Historique du document
 

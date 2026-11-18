@@ -24,6 +24,7 @@ They are gates of the supply chain more than matters of style.
 
 [[COD-750]]
 *COD-750.* The build file of an image MUST have the name `Containerfile`.
+A Quarkus project MAY keep the generated `src/main/docker/Dockerfile.jvm` and `Dockerfile.native` files instead.
 It MUST pass hadolint at the threshold `warning`, with a committed configuration.
 Check: link:https://github.com/hadolint/hadolint[hadolint] in {abbr-ci-first}.
 
@@ -31,10 +32,12 @@ hadolint checks that each base image names a tag, and runs ShellCheck on each `R
 The file `examples/.hadolint.yaml` shows a configuration.
 
 [[COD-751]]
-*COD-751.* Each `FROM` line MUST pin its image by digest, with the tag in a comment, under SEC-030.
+*COD-751.* Each `FROM` line MUST carry the digest that SEC-031 asks for, with the tag in a comment after it.
 The build MUST use stages, so that build tools stay out of the final image.
 The last `USER` line MUST name a numeric user other than 0.
-Check: hadolint for the user, and a {abbr-ci} search for `@sha256:` on each `FROM` line.
+Check: a {abbr-ci} search for `@sha256:` on each `FROM` line.
+The same search checks for a number other than 0 on the last `USER` line.
+The rule DL3002 of hadolint only checks that this user is not root.
 
 [[COD-752]]
 *COD-752.* Each image MUST carry the labels `org.opencontainers.image.source`, `org.opencontainers.image.revision`, `org.opencontainers.image.version` and `org.opencontainers.image.licenses`.

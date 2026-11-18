@@ -24,20 +24,23 @@ Ils relèvent de la sécurité de la chaîne d’approvisionnement plus que du s
 
 [[COD-750]]
 *COD-750.* Le fichier de construction d’une image DOIT porter le nom `Containerfile`.
-Il DOIT passer hadolint au seuil `warning`, avec une configuration versionnée.
+Un projet Quarkus PEUT garder à la place les fichiers générés `src/main/docker/Dockerfile.jvm` et `Dockerfile.native`.
+Il DOIT passer hadolint au seuil `warning`, avec une configuration archivée.
 Vérification : link:https://github.com/hadolint/hadolint[hadolint] dans l’{abbr-ci-first}.
 
 hadolint vérifie que chaque image de base nomme une étiquette, et passe ShellCheck sur chaque ligne `RUN`.
 Le fichier `examples/.hadolint.yaml` montre une configuration.
 
 [[COD-751]]
-*COD-751.* Chaque ligne `FROM` DOIT épingler son image par son empreinte, avec l’étiquette en commentaire, selon SEC-030.
+*COD-751.* Chaque ligne `FROM` DOIT porter l’empreinte que demande SEC-031, suivie de l’étiquette en commentaire.
 La construction DOIT employer des étapes, pour que les outils de construction restent hors de l’image finale.
 La dernière ligne `USER` DOIT nommer un utilisateur numérique autre que 0.
-Vérification : hadolint pour l’utilisateur, et une recherche de `@sha256:` sur chaque ligne `FROM` par l’{abbr-ci}.
+Vérification : une recherche par l’{abbr-ci} de `@sha256:` sur chaque ligne `FROM`.
+La même recherche vérifie un nombre autre que 0 sur la dernière ligne `USER`.
+La règle DL3002 de hadolint vérifie seulement que cet utilisateur n’est pas root.
 
 [[COD-752]]
-*COD-752.* Chaque image DOIT porter les étiquettes `org.opencontainers.image.source`, `org.opencontainers.image.revision`, `org.opencontainers.image.version` et `org.opencontainers.image.licenses`.
+*COD-752.* Chaque image DOIT porter les libellés `org.opencontainers.image.source`, `org.opencontainers.image.revision`, `org.opencontainers.image.version` et `org.opencontainers.image.licenses`.
 Vérification : un test de l’image construite, par exemple avec `podman inspect`, et la revue.
 
 Les link:https://github.com/opencontainers/image-spec/blob/main/annotations.md[annotations d’image de l’OCI] définissent ces clés.

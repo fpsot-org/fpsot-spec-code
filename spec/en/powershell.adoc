@@ -42,20 +42,20 @@ Check: `Invoke-ScriptAnalyzer` with that settings file in {abbr-ci}.
 The link:https://learn.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/rules/readme?view=ps-modules[list of PSScriptAnalyzer rules] marks which rules are off by default.
 The link:https://learn.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/using-scriptanalyzer?view=ps-modules[guide on PSScriptAnalyzer] describes the settings file.
 The file `examples/PSScriptAnalyzerSettings.psd1` shows one.
-The rule documentation gives versions such as `'7.0'` and `'5.1'`, so `'7.0'` stands for the syntax of PowerShell 7.
+The rule accepts major versions 3 to 7, so the target `'7.0'` stands for the syntax of PowerShell 7.
 
 [[COD-552]]
 *COD-552.* Scripts MUST use only approved verbs in function names, and full command names instead of aliases.
 They MUST pass parameters by name.
 They MUST NOT call `Invoke-Expression`, or hold a password or a key in plain text.
-Check: the default rules of PSScriptAnalyzer, such as `PSUseApprovedVerbs` and `PSAvoidUsingInvokeExpression`.
+Check: the default rules of PSScriptAnalyzer, such as `PSUseApprovedVerbs` and `PSAvoidUsingInvokeExpression`, and review.
 
 The link:https://learn.microsoft.com/en-us/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands?view=powershell-7.5[list of approved verbs] comes from Microsoft.
 
 [[COD-553]]
 *COD-553.* A module MUST export its functions by explicit name, never with a wildcard.
 It MUST NOT dot-source script files.
-Check: the rule `PSUseConstrainedLanguageMode`, or review.
+Check: the rules `PSUseConstrainedLanguageMode` and `PSUseToExportFieldsInManifest`, or review.
 
 Under App Control for Business, PowerShell runs untrusted scripts in constrained language mode.
 The link:https://learn.microsoft.com/en-us/powershell/scripting/security/app-control/how-app-control-works?view=powershell-7.5[Microsoft guide on App Control] asks modules to avoid dot-sourcing and wildcard exports.
@@ -106,7 +106,7 @@ Its license asks that copies share it alike, so this page only summarizes ideas 
 
 === Informative
 
-* link:https://github.com/pester/Pester/releases[Pester releases], version 6.2.0, 2026-09-09. link:https://web.archive.org/web/20241130205204/https://github.com/pester/Pester/releases[Archived copy]
+* link:https://github.com/pester/Pester/releases[Pester releases], version 6.2.0, 2026-09-09. link:https://github.com/pester/Pester/tree/98e56d65da1642a7158992b50ded240c42a3ac18/[Source at the release commit]
 * link:https://poshcode.gitbook.io/powershell-practice-and-style[PowerShell Practice and Style], PoshCode community, CC BY-SA 4.0. link:https://web.archive.org/web/20261102142720/https://poshcode.gitbook.io/powershell-practice-and-style[Archived copy]
 
 == Document history

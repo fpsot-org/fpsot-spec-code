@@ -23,7 +23,7 @@ Les espaces et l’encodage de chaque fichier suivent COD-015.
 == Règles
 
 [[COD-850]]
-*COD-850.* Les fichiers YAML DOIVENT réussir l’analyse de yamllint, avec une configuration versionnée.
+*COD-850.* Les fichiers YAML DOIVENT réussir l’analyse de yamllint, avec une configuration archivée.
 La configuration DOIT n’accepter que `true` et `false` comme valeurs booléennes.
 Elle DOIT traiter une clé répétée comme une erreur.
 Vérification : link:https://yamllint.readthedocs.io/en/stable/[yamllint] en {abbr-ci-first}, avec ses règles `truthy` et `key-duplicates`.

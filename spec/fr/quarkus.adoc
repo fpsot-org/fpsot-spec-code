@@ -38,7 +38,7 @@ Chaque version à long terme reçoit 12 mois de correctifs.
 Un projet passe à la suivante pendant cette période.
 
 Quarkus 4.0 apporte de grands changements, comme Jakarta REST 4, Jakarta Persistence 4.0 et Jackson 3.
-L’équipe Quarkus prévoit sa version finale pour le 2026-11-25.
+L’équipe Quarkus prévoit sa version finale pour la fin de novembre 2026.
 Dès sa sortie, les projets ajoutent une tâche d’{abbr-ci} sur 4.x qui ne bloque pas une fusion.
 La ligne principale passe à 4.x dès qu’une version 4.x a un soutien à long terme.
 La recherche pour cette spécification n’a pas établi si la version 4.0 elle-même en aura un.
@@ -78,21 +78,22 @@ La link:https://quarkus.io/guides/cdi-reference[référence CDI de Quarkus] expl
 La réflexion coûte du temps au démarrage et demande des réglages de plus dans une image native.
 
 [[COD-205]]
-*COD-205.* Un module qui contient des règles d’affaires ou des ports NE DOIT PAS importer `jakarta.*` ou `io.quarkus.*`.
-Un test ArchUnit dans ce module DOIT le prouver.
-Vérification : ce test ArchUnit.
+*COD-205.* Les paquets du domaine et des ports d’une bibliothèque de la {abbr-fpsot} NE DOIVENT PAS importer `jakarta.*`.
+Ils NE DOIVENT PAS non plus importer `io.quarkus.*`.
+Cette règle étend au cadriciel la règle sur les paquets de COD-114.
+Vérification : un test ArchUnit, selon COD-104.
 
-Un module de règles sans code de cadriciel s’exécute dans tout programme Java, et un adoptant peut le remplacer.
-La page xref:overridable-rules.adoc[Règles substituables] montre comment une extension expose une telle règle.
-Cette page est informative, car la future spécification sur les capacités régira le contrat des substitutions.
+Le code du domaine sans importation de cadriciel s’exécute dans tout programme Java et se teste sans conteneur.
 
 [[COD-206]]
 *COD-206.* Le code des bibliothèques et des extensions NE DOIT PAS chercher des beans par `CDI.current()` ou `Arc.container()`.
-Un bean que le code trouve au moyen de `Instance<T>` DOIT porter `@Unremovable`.
+Un bean que seul du code extérieur à l’injection CDI atteint DOIT porter `@Unremovable`.
+À défaut, son extension DOIT produire un `UnremovableBeanBuildItem` pour ce bean.
 Vérification : un test ArchUnit, ou la revue.
 
 Quarkus retire les beans inutilisés à la construction.
-Une recherche par nom à l’exécution échappe à cette analyse, et le bean peut avoir disparu.
+La link:https://quarkus.io/guides/cdi-reference[référence CDI] explique que Quarkus garde chaque bean qu’un point d’injection de `Instance<T>` ou de `Provider<T>` peut atteindre.
+Une recherche par programme au moyen de `CDI.current()` échappe à cette analyse, et le bean peut avoir disparu.
 
 [[COD-207]]
 *COD-207.* Une extension DOIT inscrire les classes et les ressources dont une image native a besoin.
@@ -111,7 +112,7 @@ Vérification : revue, et les tests du module de déploiement.
 == Images natives
 
 [[COD-209]]
-*COD-209.* Une construction native DOIT employer une image de construction Mandrel 25 épinglée par son empreinte, selon SEC-030.
+*COD-209.* Une construction native DOIT employer une image de construction Mandrel 25 épinglée par son empreinte, selon SEC-031.
 Elle DOIT employer la même version majeure du JDK que la construction sur la JVM.
 Elle DOIT fixer `quarkus.native.native-image-xmx` et l’option `--parallelism` de `native-image`.
 Vérification : revue de la configuration de construction.
@@ -129,6 +130,7 @@ C’est ainsi qu’un artefact natif respecte TST-065.
 
 [[COD-211]]
 *COD-211.* Une application DOIT produire sa nomenclature logicielle avec l’extension `quarkus-cyclonedx`.
+Les bibliothèques et les extensions DOIVENT livrer uniquement des archives Java, jamais d’exécutables natifs.
 Vérification : le flux de travail de publication.
 
 Le link:https://quarkus.io/guides/cyclonedx[guide CycloneDX de Quarkus] fait de l’exécutable le composant principal de la nomenclature.

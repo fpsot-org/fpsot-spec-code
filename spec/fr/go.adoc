@@ -18,20 +18,21 @@ La {abbr-fpsot-first} écrit ses outils en Go, comme les vérificateurs pour l�
 |Outil |Version |Rôle
 |Go |1.27.x pour construire, 1.26 dans la ligne `go` |Compile et teste le code.
 |golangci-lint |2.15.0 |Met le code en forme et exécute les analyseurs.
-|govulncheck |la plus récente version |Repère les faiblesses connues que le code atteint.
+|govulncheck |1.10.0 |Repère les faiblesses connues que le code atteint.
+|go test |la version de la chaîne d’outils |Exécute les tests.
 |===
 
 == Règles
 
 [[COD-400]]
-*COD-400.* Un projet DOIT se construire avec la plus récente version de la ligne Go soutenue la plus récente.
-La ligne `go` de `go.mod` DOIT nommer la ligne soutenue précédente.
-Les deux lignes soutenues peuvent ainsi construire le code.
+*COD-400.* Un projet DOIT se construire avec la dernière version de la plus récente ligne de versions Go soutenue.
+La ligne `go` de `go.mod` DOIT nommer la ligne de versions soutenue précédente.
+Les deux lignes de versions soutenues peuvent ainsi construire le code.
 Un projet DOIT passer à une nouvelle version majeure dans les 6 mois de sa sortie.
 Vérification : revue de `go.mod` et des tâches d’{abbr-ci}.
 
 La link:https://go.dev/doc/devel/release[politique de versions de Go] soutient chaque version majeure jusqu’à la sortie de deux versions plus récentes.
-Pour cette édition, les lignes soutenues sont 1.27 et 1.26.
+Pour cette édition, les lignes de versions soutenues sont 1.27 et 1.26.
 
 [[COD-401]]
 *COD-401.* Le code Go DOIT réussir `golangci-lint fmt` et `golangci-lint run`.
@@ -53,10 +54,11 @@ Vérification : ces commandes dans l’{abbr-ci}.
 
 L’outil link:https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck[govulncheck] ne signale que les faiblesses que le code peut atteindre.
 C’est le mécanisme Go pour SEC-014.
+TST-006 laisse le choix de l’outil de test, et les projets Go emploient `go test`.
 
 [[COD-403]]
 *COD-403.* L’{abbr-ci} DOIT fixer `GOTOOLCHAIN` à une version exacte.
-Après `go mod tidy`, l’{abbr-ci} NE DOIT trouver aucun changement dans `go.mod` ou `go.sum`.
+Après `go mod tidy`, l’{abbr-ci} DOIT ne signaler aucun changement dans `go.mod` ou `go.sum`.
 La commande `go mod verify` DOIT réussir, et le {term-repository} DOIT archiver `go.sum`.
 Vérification : ces commandes dans l’{abbr-ci}.
 
@@ -74,9 +76,9 @@ Le link:https://go.dev/blog/rebuild[blogue de Go sur les constructions parfaitem
 
 [[COD-405]]
 *COD-405.* Le code DOIT comparer les erreurs avec `errors.Is`, `errors.As` ou `errors.AsType`, jamais avec `==` sur une erreur enveloppée.
-Il DOIT envelopper une erreur avec le verbe `%w` quand l’appelant peut en examiner la cause.
-Il NE DOIT PAS envelopper un pointeur vers une erreur dont les méthodes ont un récepteur par valeur.
-Vérification : l’analyseur `errorlint` et `go vet`.
+Il NE DOIT PAS envelopper avec `%w` un pointeur vers un type d’erreur aux méthodes à récepteur par valeur.
+Il DEVRAIT envelopper avec `%w` seulement quand l’appelant peut examiner la cause, et employer `%v` sinon.
+Vérification : l’analyseur `errorlint` et `go vet` pour les obligations, et la revue pour la recommandation.
 
 La version link:https://go.dev/doc/go1.26[Go 1.26] a ajouté `errors.AsType`.
 Dans link:https://go.dev/doc/go1.27[Go 1.27], `go vet` signale un `%w` qui enveloppe un tel pointeur, car `errors.Is` échoue alors souvent.

@@ -36,7 +36,7 @@ Un script pour la version 5.1 s’exécute aussi sous 7.6, alors l’{abbr-ci} l
 Vérification : revue des tâches de l’{abbr-ci}.
 
 [[COD-551]]
-*COD-551.* Chaque {term-repository} DOIT analyser ses scripts avec PSScriptAnalyzer et un fichier de paramètres versionné.
+*COD-551.* Chaque {term-repository} DOIT analyser ses scripts avec PSScriptAnalyzer et un fichier de paramètres archivé.
 Les paramètres DOIVENT activer les règles de mise en forme, désactivées par défaut.
 Ils DOIVENT aussi activer `PSUseCompatibleSyntax`, avec les cibles `'5.1'` et `'7.0'`.
 Vérification : `Invoke-ScriptAnalyzer` avec ce fichier de paramètres dans l’{abbr-ci}.
@@ -44,7 +44,7 @@ Vérification : `Invoke-ScriptAnalyzer` avec ce fichier de paramètres dans l’
 La link:https://learn.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/rules/readme?view=ps-modules[liste des règles de PSScriptAnalyzer] indique celles qui sont désactivées par défaut.
 Le link:https://learn.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/using-scriptanalyzer?view=ps-modules[guide de PSScriptAnalyzer] décrit le fichier de paramètres.
 Le fichier `examples/PSScriptAnalyzerSettings.psd1` en montre un.
-La documentation de la règle donne des versions comme `'7.0'` et `'5.1'`.
+La règle accepte les versions majeures 3 à 7.
 La cible `'7.0'` représente donc la syntaxe de PowerShell 7.
 
 [[COD-552]]
@@ -52,14 +52,14 @@ La cible `'7.0'` représente donc la syntaxe de PowerShell 7.
 Ils DOIVENT employer le nom complet des commandes plutôt que des alias.
 Ils DOIVENT passer les paramètres par leur nom.
 Ils NE DOIVENT PAS appeler `Invoke-Expression`, ni contenir un mot de passe ou une clé en clair.
-Vérification : les règles par défaut de PSScriptAnalyzer, comme `PSUseApprovedVerbs` et `PSAvoidUsingInvokeExpression`.
+Vérification : les règles par défaut de PSScriptAnalyzer, comme `PSUseApprovedVerbs` et `PSAvoidUsingInvokeExpression`, et la revue.
 
 La link:https://learn.microsoft.com/en-us/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands?view=powershell-7.5[liste des verbes approuvés] vient de Microsoft.
 
 [[COD-553]]
 *COD-553.* Un module DOIT exporter ses fonctions par leur nom explicite, jamais avec un caractère générique.
 Il NE DOIT PAS charger des fichiers de script par dot-sourcing.
-Vérification : la règle `PSUseConstrainedLanguageMode`, ou la revue.
+Vérification : les règles `PSUseConstrainedLanguageMode` et `PSUseToExportFieldsInManifest`, ou la revue.
 
 Sous App Control for Business, PowerShell exécute les scripts non approuvés en mode de langage restreint.
 Le link:https://learn.microsoft.com/en-us/powershell/scripting/security/app-control/how-app-control-works?view=powershell-7.5[guide de Microsoft sur App Control] demande aux modules d’éviter le dot-sourcing et les exportations génériques.
@@ -111,7 +111,7 @@ Cette page se limite donc à en résumer des idées.
 
 === Références informatives
 
-* link:https://github.com/pester/Pester/releases[Pester releases], version 6.2.0, 2026-09-09. link:https://web.archive.org/web/20241130205204/https://github.com/pester/Pester/releases[Copie archivée]
+* link:https://github.com/pester/Pester/releases[Pester releases], version 6.2.0, 2026-09-09. link:https://github.com/pester/Pester/tree/98e56d65da1642a7158992b50ded240c42a3ac18/[Source à l’archivage de la version]
 * link:https://poshcode.gitbook.io/powershell-practice-and-style[PowerShell Practice and Style], PoshCode community, CC BY-SA 4.0. link:https://web.archive.org/web/20261102142720/https://poshcode.gitbook.io/powershell-practice-and-style[Copie archivée]
 
 == Historique du document

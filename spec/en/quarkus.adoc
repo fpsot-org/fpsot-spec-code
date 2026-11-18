@@ -37,7 +37,7 @@ Each long-term release gets 12 months of fixes.
 A project moves to the next one within that time.
 
 Quarkus 4.0 brings large changes, such as Jakarta REST 4, Jakarta Persistence 4.0 and Jackson 3.
-The Quarkus team plans its final release for 2026-11-25.
+The Quarkus team plans its final release for the end of November 2026.
 Once it ships, projects add a {abbr-ci} job on 4.x that does not block a merge.
 The main line moves to 4.x once a 4.x release has long-term support.
 The research for this specification did not find whether 4.0 itself will have it.
@@ -77,21 +77,21 @@ The link:https://quarkus.io/guides/cdi-reference[Quarkus CDI reference] explains
 Reflection costs time at startup and needs extra setup in a native image.
 
 [[COD-205]]
-*COD-205.* A module that holds business rules or ports MUST NOT import `jakarta.*` or `io.quarkus.*`.
-An ArchUnit test in that module MUST prove it.
-Check: that ArchUnit test.
+*COD-205.* The domain and port packages of an {abbr-fpsot} library MUST NOT import `jakarta.*` or `io.quarkus.*`.
+This extends the package rule of COD-114 to the framework.
+Check: an ArchUnit test, under COD-104.
 
-A rule module without framework code runs in any Java program, and an adopter can replace it.
-The xref:overridable-rules.adoc[Overridable rules] page shows how an extension exposes such a rule.
-That page is informative, since the future capability specification will own the contract of overrides.
+Domain code without framework imports runs in any Java program and tests without a container.
 
 [[COD-206]]
 *COD-206.* Library and extension code MUST NOT look up beans through `CDI.current()` or `Arc.container()`.
-A bean that code finds through `Instance<T>` MUST carry `@Unremovable`.
+A bean that only code outside CDI injection reaches MUST carry `@Unremovable`.
+Otherwise, its extension MUST produce an `UnremovableBeanBuildItem` for it.
 Check: an ArchUnit test, or review.
 
 Quarkus removes unused beans at build time.
-A lookup by name at run time escapes that analysis, and the bean may be gone.
+The link:https://quarkus.io/guides/cdi-reference[CDI reference] explains that Quarkus keeps each bean that an injection point of `Instance<T>` or `Provider<T>` can reach.
+A programmatic lookup through `CDI.current()` escapes that analysis, and the bean may be gone.
 
 [[COD-207]]
 *COD-207.* An extension MUST register the classes and resources that a native image needs through build items.
@@ -109,7 +109,7 @@ Check: review, and the tests of the deployment module.
 == Native images
 
 [[COD-209]]
-*COD-209.* A native build MUST use a Mandrel 25 builder image pinned by digest, under SEC-030.
+*COD-209.* A native build MUST use a Mandrel 25 builder image pinned by digest, under SEC-031.
 It MUST use the same major version of the JDK as the build on the JVM.
 It MUST set `quarkus.native.native-image-xmx` and the `--parallelism` option of `native-image`.
 Check: review of the build configuration.
@@ -126,6 +126,7 @@ This is how a native artifact meets TST-065.
 
 [[COD-211]]
 *COD-211.* An application MUST write its software bill of materials with the `quarkus-cyclonedx` extension.
+Libraries and extensions MUST ship Java archives only, never native executables.
 Check: the release workflow.
 
 The link:https://quarkus.io/guides/cyclonedx[Quarkus CycloneDX guide] makes the executable the main component of the bill.

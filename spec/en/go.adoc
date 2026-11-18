@@ -18,7 +18,8 @@ This page covers Go code.
 |Tool |Version |Role
 |Go |1.27.x to build, 1.26 in the `go` line |Compiles and tests code.
 |golangci-lint |2.15.0 |Formats code and runs the linters.
-|govulncheck |the latest release |Finds known weaknesses that the code reaches.
+|govulncheck |1.10.0 |Finds known weaknesses that the code reaches.
+|go test |the version of the toolchain |Runs the tests.
 |===
 
 == Rules
@@ -50,6 +51,7 @@ Check: those commands in {abbr-ci}.
 
 link:https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck[govulncheck] reports only the weaknesses that the code can reach.
 It is the Go mechanism for SEC-014.
+TST-006 leaves the test runner open, and Go projects use `go test`.
 
 [[COD-403]]
 *COD-403.* The {abbr-ci} MUST set `GOTOOLCHAIN` to an exact version.
@@ -70,9 +72,9 @@ The link:https://go.dev/blog/rebuild[Go blog on perfectly reproducible builds] g
 
 [[COD-405]]
 *COD-405.* Code MUST compare errors with `errors.Is`, `errors.As` or `errors.AsType`, never with `==` on a wrapped error.
-It MUST wrap an error with the verb `%w` when the caller may inspect the cause.
-It MUST NOT wrap a pointer to an error whose methods have a value receiver.
-Check: the `errorlint` linter and `go vet`.
+It MUST NOT use `%w` to wrap a pointer to an error type whose methods have a value receiver.
+It SHOULD wrap with `%w` only when the caller may inspect the cause, and use `%v` otherwise.
+Check: the `errorlint` linter and `go vet` for the MUST parts, and review for the SHOULD part.
 
 link:https://go.dev/doc/go1.26[Go 1.26] added `errors.AsType`.
 In link:https://go.dev/doc/go1.27[Go 1.27], `go vet` reports a `%w` that wraps such a pointer, since `errors.Is` then often fails.

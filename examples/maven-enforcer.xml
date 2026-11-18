@@ -21,6 +21,10 @@
           <requireJavaVersion>
             <version>[25,)</version>
           </requireJavaVersion>
+          <requireProperty>
+            <property>maven.compiler.release</property>
+            <regex>21</regex>
+          </requireProperty>
           <requirePluginVersions/>
           <dependencyConvergence/>
           <banDynamicVersions/>

@@ -25,6 +25,7 @@ Code that runs on Quarkus also follows the xref:quarkus.adoc[Quarkus] page.
 |JSpecify |1.0.1 |Nullness annotations.
 |SpotBugs Maven plugin with Find Security Bugs |4.10.5.0 and 1.14.0 |Finds bugs and security weaknesses in bytecode.
 |ArchUnit |1.5.1 |Tests architecture rules.
+|JUnit Jupiter |6.1.3 |Runs the tests.
 |Maven Enforcer Plugin |3.7.0 |Checks versions and dependencies.
 |japicmp Maven plugin |0.27.0 |Compares the public interface with the last release.
 |===
@@ -36,7 +37,8 @@ Code that runs on Quarkus also follows the xref:quarkus.adoc[Quarkus] page.
 They MUST build and test on the Java 25 long-term support release.
 The {abbr-ci-first} SHOULD also test on the latest feature release of the JDK.
 That job does not block a merge.
-Check: the `requireJavaVersion` rule of the Maven Enforcer Plugin, and review of the {abbr-ci} jobs.
+Check: the rules `requireJavaVersion` and `requireProperty` of the Maven Enforcer Plugin, the latter on `maven.compiler.release` with the value `21`.
+Review checks the {abbr-ci} jobs.
 
 Java 21 is the floor of Quarkus 4, as the link:https://quarkus.io/blog/quarkus-4-0-0-beta1-released/[Quarkus 4.0.0.Beta1 announcement] states.
 Java 25 is the current long-term support release.
@@ -44,7 +46,7 @@ The next review of this page checks the next long-term release.
 
 [[COD-101]]
 *COD-101.* A published artifact MUST NOT use a preview feature of Java.
-Check: review that no build file passes `--enable-preview`.
+Check: a {abbr-ci} search for `--enable-preview` in the build files.
 
 A class file that uses preview features runs only on the exact JDK that compiled it, as link:https://openjdk.org/jeps/12[JEP 12] explains.
 
@@ -80,6 +82,7 @@ Check: the Maven build.
 link:https://github.com/google/error-prone/releases[Error Prone] runs inside the compiler.
 link:https://spotbugs.github.io/[SpotBugs] reads the bytecode, and link:https://find-sec-bugs.github.io/[Find Security Bugs] adds security detectors to it.
 link:https://www.archunit.org/[ArchUnit] states rules on packages and classes as unit tests.
+TST-006 leaves the test runner open, and Java projects use JUnit Jupiter.
 Limits on the length of methods or the number of parameters stay review guidance, not build failures.
 
 == Errors and data
@@ -98,7 +101,8 @@ Kotlin follows the same model, under COD-303.
 [[COD-106]]
 *COD-106.* A method MUST NOT return `null` in place of an empty collection or an empty `Optional`.
 Code MUST NOT use Java serialization to exchange or store data.
-Check: NullAway for the return values, and review for serialization.
+Check: NullAway for `null` returns in code that `@NullMarked` covers, and Find Security Bugs for unsafe deserialization.
+Review covers the rest.
 
 == Build
 
@@ -141,7 +145,7 @@ This check turns that promise into a test.
 
 [[COD-111]]
 *COD-111.* Each library without a `module-info.java` file MUST set `Automatic-Module-Name` in the manifest of its archive.
-The name MUST follow NAM-022.
+The name SHOULD follow NAM-022, which is itself a SHOULD.
 Check: review of the archive manifest.
 
 [[COD-112]]
@@ -165,7 +169,7 @@ The link:https://central.sonatype.org/publish/publish-maven/[guide for Maven] gi
 == Packages
 
 [[COD-114]]
-*COD-114.* A library of a public sector component MUST keep its domain and its ports apart from its adapters.
+*COD-114.* An {abbr-fpsot} library MUST keep its domain and its ports apart from its adapters.
 Their packages MUST NOT import an adapter package.
 Adapters MUST depend on ports, never the reverse.
 An application module MAY use layered packages inside its adapters.
@@ -193,7 +197,7 @@ The xref:overridable-rules.adoc[Overridable rules] page shows how a Quarkus exte
 * link:https://hub.quarkiverse.io/checklistfornewprojects/[Checklist for new projects], Quarkiverse. link:https://web.archive.org/web/20250207074542/https://hub.quarkiverse.io/checklistfornewprojects/[Archived copy]
 * link:https://code.revelc.net/formatter-maven-plugin/[Formatter Maven Plugin], revelc.net, version 2.29.0. link:https://web.archive.org/web/20260809181016/https://code.revelc.net/formatter-maven-plugin/[Archived copy]
 * link:https://code.revelc.net/impsort-maven-plugin/[ImpSort Maven Plugin], revelc.net, version 1.13.0. link:https://web.archive.org/web/20260809181016/https://code.revelc.net/impsort-maven-plugin/[Archived copy]
-* link:https://github.com/uber/NullAway/releases[NullAway releases], Uber, version 0.14.4, 2026-11-16. link:https://web.archive.org/web/20260309021407/https://github.com/uber/NullAway/releases[Archived copy]
+* link:https://github.com/uber/NullAway/releases[NullAway releases], Uber, version 0.14.4, 2026-11-16. link:https://github.com/uber/NullAway/tree/5be6a1d8059c43bd61059faf6097a50b41e5ad8f/[Source at the release commit]
 * link:https://github.com/google/error-prone/releases[Error Prone releases], Google, version 2.52.0. link:https://web.archive.org/web/20260416032058/https://github.com/google/error-prone/releases[Archived copy]
 * link:https://spotbugs.github.io/[SpotBugs], SpotBugs project. link:https://web.archive.org/web/20261104195909/https://spotbugs.github.io/[Archived copy]
 * link:https://find-sec-bugs.github.io/[Find Security Bugs], version 1.14.0. link:https://web.archive.org/web/20261103042115/https://find-sec-bugs.github.io/[Archived copy]

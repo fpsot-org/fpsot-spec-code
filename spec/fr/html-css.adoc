@@ -3,7 +3,7 @@ include::_fpsot-terms.adoc[]
 
 Cette page vise les gabarits qui produisent du {abbr-html-first}, ainsi que les feuilles de style.
 La spécification sur l’accessibilité fixe ce que les pages doivent offrir aux personnes, à partir d’ACC-001.
-La spécification sur le style fixe les jetons de conception et les thèmes, à partir de STY-001.
+La spécification sur le style fixe les jetons de design et les thèmes, à partir de STY-001.
 Cette page ajoute les règles mécaniques.
 
 [cols="1,3"]
@@ -49,7 +49,8 @@ Le link:https://quarkus.io/guides/qute-reference[guide de référence de Qute] �
 [[COD-653]]
 *COD-653.* Les feuilles de style DOIVENT passer stylelint avec `stylelint-config-standard`.
 Elles DOIVENT prendre les couleurs, les espacements et la typographie dans les propriétés personnalisées du système de design, selon STY-001.
-Vérification : link:https://stylelint.io/[stylelint] dans l’{abbr-ci}, avec des règles qui interdisent les couleurs brutes, comme `color-no-hex` et `color-named`.
+Vérification : link:https://stylelint.io/[stylelint] dans l’{abbr-ci}, avec `color-no-hex` et `color-named` pour les couleurs brutes.
+Le plugiciel link:https://github.com/AndyOGo/stylelint-declaration-strict-value[stylelint-declaration-strict-value] vérifie les espacements et la typographie, et la revue couvre le reste.
 
 [[COD-654]]
 *COD-654.* Les feuilles de style DEVRAIENT ordonner leurs couches avec `@layer`, à la manière de CUBE CSS.
@@ -70,6 +71,7 @@ CUBE ordonne les couches, et BEM nomme les blocs qu’elles contiennent.
 
 === Références informatives
 
+* link:https://github.com/AndyOGo/stylelint-declaration-strict-value[stylelint-declaration-strict-value], version 1.13.0. link:https://web.archive.org/web/20260827165949/https://github.com/AndyOGo/stylelint-declaration-strict-value[Copie archivée]
 * link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src[CSP: script-src], MDN Web Docs. link:https://web.archive.org/web/20250312043548/https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src[Copie archivée]
 * link:https://cube.fyi/[CUBE CSS], Andy Bell. link:https://web.archive.org/web/20261029084217/https://cube.fyi/[Copie archivée]
 * link:https://getbem.com/[BEM, Block Element Modifier]. link:https://web.archive.org/web/20261001124241/http://getbem.com/[Copie archivée]

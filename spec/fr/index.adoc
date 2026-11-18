@@ -78,7 +78,7 @@ Une page dont la date limite est passée reste en vigueur, mais ses tableaux de 
 * Les pages xref:bash.adoc[Bash] et xref:powershell.adoc[PowerShell] couvrent les scripts.
 * Les pages xref:javascript.adoc[JavaScript et TypeScript] et xref:html-css.adoc[HTML et CSS] couvrent ce qui s’exécute dans le navigateur.
 * La page xref:sql.adoc[SQL] couvre les requêtes et les migrations de bases de données.
-* Les pages xref:containers.adoc[Fichiers de conteneurs], xref:workflows.adoc[Flux de travail d’IC] et xref:config.adoc[Fichiers de configuration] couvrent ce qui construit les logiciels.
+* Les pages xref:containers.adoc[Fichiers de conteneur], xref:workflows.adoc[Flux de travail d’IC] et xref:config.adoc[Fichiers de configuration] couvrent ce qui construit les logiciels.
 Elles couvrent aussi ce qui les livre et les configure.
 * La page xref:python.adoc[Python] couvre les scripts d’outillage.
 

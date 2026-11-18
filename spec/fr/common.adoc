@@ -26,7 +26,7 @@ Pour Go, le paramètre `exclusions.generated` de golangci-lint s’en charge.
 
 [[COD-012]]
 *COD-012.* Un commentaire seul NE DOIT PAS désactiver un signalement élevé ou critique d’un analyseur de sécurité.
-Un tel signalement exige une exception selon SEC-016, avec sa raison, son responsable et sa date de fin.
+Un tel signalement exige une exception selon SEC-016.
 Le commentaire qui désactive le signalement DOIT citer cette exception.
 Vérification : revue, selon SEC-010.
 
@@ -175,7 +175,7 @@ Le link:https://best.openssf.org/Security-Focused-Guide-for-AI-Code-Assistant-In
 
 * link:https://golangci-lint.run/docs/linters/configuration/[Linters settings], golangci-lint, version 2. link:https://web.archive.org/web/20261109231801/https://golangci-lint.run/docs/linters/configuration/[Copie archivée]
 * link:https://eslint-community.github.io/eslint-plugin-eslint-comments/rules/require-description.html[eslint-comments/require-description], ESLint Community. link:https://web.archive.org/web/20260625152725/https://eslint-community.github.io/eslint-plugin-eslint-comments/rules/require-description.html[Copie archivée]
-* link:https://github.com/editorconfig-checker/editorconfig-checker[editorconfig-checker], version 4.0.2, 2026-09-19. link:https://web.archive.org/web/20260819050352/https://github.com/editorconfig-checker/editorconfig-checker[Copie archivée]
+* link:https://github.com/editorconfig-checker/editorconfig-checker[editorconfig-checker], version 4.0.2, 2026-09-19. link:https://github.com/editorconfig-checker/editorconfig-checker/tree/0adfdb012938ada0cf563a40f2fceaf9466290ca/[Source à l’archivage de la version]
 * link:https://github.com/rust-lang/rust/blob/master/src/doc/style-guide/src/editions.md[Rust style editions], The Rust Style Guide. link:https://web.archive.org/web/20250520035929/https://github.com/rust-lang/rust/blob/master/src/doc/style-guide/src/editions.md[Copie archivée]
 * link:https://agents.md/[AGENTS.md], format ouvert pour les agents de programmation. link:https://web.archive.org/web/20261117200853/https://agents.md/[Copie archivée]
 * link:https://best.openssf.org/Security-Focused-Guide-for-AI-Code-Assistant-Instructions[Security-Focused Guide for AI Code Assistant Instructions], Open Source Security Foundation. link:https://web.archive.org/web/20261005132941/https://best.openssf.org/Security-Focused-Guide-for-AI-Code-Assistant-Instructions[Copie archivée]

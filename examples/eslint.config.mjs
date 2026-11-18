@@ -20,6 +20,11 @@ export default defineConfig([
       },
     },
   },
+  // JavaScript files, such as this configuration, have no type information.
+  {
+    files: ["**/*.{js,mjs,cjs}"],
+    ...tseslint.configs.disableTypeChecked,
+  },
   comments.recommended,
   {
     rules: {

@@ -74,6 +74,8 @@ case_fails editorconfig-crlf '\[\*\] must set end_of_line = lf \(COD-015\)' \
   'sub(".editorconfig", "end_of_line = lf", "end_of_line = crlf")'
 case_fails enforcer-without-ranges-ban 'enforcer rule banDynamicVersions is missing \(COD-108\)' \
   'sub("maven-enforcer.xml", "          <banDynamicVersions/>\n", "")'
+case_fails enforcer-release-17 'requireProperty must fix maven.compiler.release to 21 \(COD-100\)' \
+  'sub("maven-enforcer.xml", "<regex>21</regex>", "<regex>17</regex>")'
 case_fails enforcer-broken-xml 'does not parse as XML' \
   'sub("maven-enforcer.xml", "</plugin>", "</plugn>")'
 case_fails eslint-no-description 'eslint-comments/require-description must be an error \(COD-010\)' \
@@ -84,6 +86,12 @@ case_fails psd1-compat-off 'PSUseCompatibleSyntax must be on \(COD-551\)' \
   's = rd("PSScriptAnalyzerSettings.psd1"); i = s.index("PSUseCompatibleSyntax"); wr("PSScriptAnalyzerSettings.psd1", s[:i] + s[i:].replace("Enable         = $true", "Enable         = $false", 1))'
 case_fails psd1-unbalanced 'PSScriptAnalyzerSettings.psd1: does not parse' \
   'sub("PSScriptAnalyzerSettings.psd1", "        PSUseCorrectCasing = @{\n            Enable = $true\n        }", "        PSUseCorrectCasing = @{\n            Enable = $true\n")'
+case_fails eslint-js-type-checked 'JavaScript files must turn off the type-checked rules \(COD-603\)' \
+  'sub("eslint.config.mjs", "    ...tseslint.configs.disableTypeChecked,\n", "")'
+case_fails shellcheck-single-brackets 'enable=require-double-brackets is missing \(COD-502\)' \
+  'sub(".shellcheckrc", "enable=require-double-brackets", "enable=quote-safe-variables")'
+case_fails shellcheckrc-garbage 'line [0-9]+ is not a key=value setting' \
+  'wr(".shellcheckrc", rd(".shellcheckrc") + "not a setting\n")'
 case_fails missing-spdx 'zizmor.yml: no SPDX-License-Identifier line in the first three lines \(COD-014\)' \
   'sub("zizmor.yml", "# SPDX-License-Identifier: Apache-2.0\n", "")'
 case_fails broken-toml 'does not parse as TOML' \

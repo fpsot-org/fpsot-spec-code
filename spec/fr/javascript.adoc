@@ -25,17 +25,19 @@ La révision vient après six mois, car TypeScript et son analyseur statique son
 |ESLint |10.15.0 |Analyse le code, avec la configuration plate seulement.
 |typescript-eslint |8.73.0 |Ajoute des règles qui lisent les types.
 |Prettier |3.10.1 |Met en forme le code.
+|Vitest, ou `node:test` |5.1.1, ou la version de Node.js |Exécute les tests.
 |===
 
 == Règles
 
 [[COD-600]]
 *COD-600.* Tout nouveau travail DOIT s’exécuter sur Node.js 26.
-Un projet DOIT s’exécuter seulement sur une branche de Node.js en soutien à long terme, active ou en maintenance.
-Il DOIT déclarer cette branche dans le champ `engines` de `package.json` et dans un fichier `.node-version`.
-Vérification : `npm ci`, qui avertit d’un moteur incorrect, et revue des tâches de l’{abbr-ci-first}.
+Un projet DOIT s’exécuter seulement sur une ligne de versions de Node.js en soutien à long terme.
+Cette ligne DOIT être active ou en maintenance.
+Il DOIT déclarer cette ligne de versions dans le champ `engines` de `package.json` et dans un fichier `.node-version`.
+Vérification : `npm ci` avec `engine-strict=true`, qui échoue sur un moteur incorrect, et revue des tâches de l’{abbr-ci-first}.
 
-La link:https://nodejs.org/en/about/previous-releases[page des versions de Node.js] donne chaque branche et sa date de fin.
+La link:https://nodejs.org/en/about/previous-releases[page des versions de Node.js] donne chaque ligne de versions et sa date de fin.
 À partir de Node.js 27, il paraît link:https://nodejs.org/en/blog/announcements/evolving-the-nodejs-release-schedule[une version majeure par an].
 Chacune devient une version à soutien à long terme.
 
@@ -70,12 +72,13 @@ link:https://prettier.io/[Prettier] décide de la mise en page.
 Le fichier `examples/eslint.config.mjs` montre une configuration conforme.
 
 [[COD-604]]
-*COD-604.* Un projet DOIT versionner son fichier de verrouillage et installer avec `npm ci`.
+*COD-604.* Un projet DOIT archiver son fichier de verrouillage et installer avec `npm ci`.
 Son fichier `.npmrc` DOIT régler `ignore-scripts=true` et `allow-git=none`.
-Il DOIT aussi régler `min-release-age` à au moins 3 jours.
+Il DOIT aussi régler `engine-strict=true`, et `min-release-age` à au moins 3 jours.
 Vérification : revue de `.npmrc` et des tâches de l’{abbr-ci}.
 
 Ces link:https://docs.npmjs.com/cli/v11/using-npm/config[paramètres de npm] sont le mécanisme de npm pour SEC-030 et SEC-032.
+TST-006 laisse le choix de l’outil de test, et cette page nomme Vitest ou le module `node:test` de Node.js.
 Un délai d’attente laisse au registre le temps de retirer une version malveillante avant qu’un projet l’installe.
 
 [[COD-605]]
@@ -87,7 +90,8 @@ Elle ajoute la provenance d’elle-même.
 Elle sert SEC-024 et SEC-035.
 
 [[COD-606]]
-*COD-606.* Une interface DOIT produire ses pages en {abbr-html} sur le serveur, et ajouter les scripts par amélioration progressive.
+*COD-606.* Une interface utilisateur Web DOIT produire ses pages en {abbr-html} sur le serveur.
+Elle DOIT ajouter les scripts par amélioration progressive.
 Un projet qui a besoin d’un cadriciel d’application monopage DOIT d’abord consigner cette décision, avec ses motifs.
 Vérification : revue.
 

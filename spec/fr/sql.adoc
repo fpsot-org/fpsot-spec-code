@@ -71,15 +71,20 @@ Vérification : SpotBugs avec Find Security Bugs, gosec et la revue.
 Ces règles bloquent l’link:https://cwe.mitre.org/data/definitions/89.html[injection SQL, CWE-89], deuxième faiblesse de la liste de 2025.
 
 [[COD-705]]
-*COD-705.* Les fichiers {abbr-sql} DOIVENT passer sqlfluff avec le dialecte `postgres` et une configuration versionnée.
+*COD-705.* Les fichiers {abbr-sql} DOIVENT passer sqlfluff avec le dialecte `postgres` et une configuration archivée.
 Vérification : link:https://docs.sqlfluff.com/en/stable/[sqlfluff] dans l’{abbr-ci-first}.
 
 [[COD-706]]
 *COD-706.* Les tables DEVRAIENT employer des colonnes d’identité de la forme `GENERATED ALWAYS AS IDENTITY`, plutôt que les types `serial`.
 Les instants DEVRAIENT employer `timestamptz`.
 Les colonnes DEVRAIENT être `NOT NULL`, sauf si une valeur peut manquer.
-Les noms de tables et de colonnes DOIVENT suivre NAM-010 et NAM-013.
+Les noms de tables et de colonnes DOIVENT être en snake_case.
+Ils DOIVENT aussi respecter NAM-004, NAM-009 et NAM-013.
 Vérification : revue.
+
+La spécification sur le nommage n’a pas encore de ligne pour les identifiants {abbr-sql}.
+Cette page en fixe donc la casse pour l’instant.
+Cette partie passera à la spécification sur le nommage dès qu’elle aura une telle ligne.
 
 == Références
 

@@ -25,7 +25,7 @@ For Go, the `exclusions.generated` setting of golangci-lint does this.
 
 [[COD-012]]
 *COD-012.* A comment alone MUST NOT turn off a high or critical finding of a security analyzer.
-Such a finding needs an exception under SEC-016, with its reason, its owner and its end date.
+Such a finding needs an exception under SEC-016.
 The comment that turns off the finding MUST cite that exception.
 Check: review, under SEC-010.
 
@@ -170,7 +170,7 @@ The link:https://best.openssf.org/Security-Focused-Guide-for-AI-Code-Assistant-I
 
 * link:https://golangci-lint.run/docs/linters/configuration/[Linters settings], golangci-lint, version 2. link:https://web.archive.org/web/20261109231801/https://golangci-lint.run/docs/linters/configuration/[Archived copy]
 * link:https://eslint-community.github.io/eslint-plugin-eslint-comments/rules/require-description.html[eslint-comments/require-description], ESLint Community. link:https://web.archive.org/web/20260625152725/https://eslint-community.github.io/eslint-plugin-eslint-comments/rules/require-description.html[Archived copy]
-* link:https://github.com/editorconfig-checker/editorconfig-checker[editorconfig-checker], version 4.0.2, 2026-09-19. link:https://web.archive.org/web/20260819050352/https://github.com/editorconfig-checker/editorconfig-checker[Archived copy]
+* link:https://github.com/editorconfig-checker/editorconfig-checker[editorconfig-checker], version 4.0.2, 2026-09-19. link:https://github.com/editorconfig-checker/editorconfig-checker/tree/0adfdb012938ada0cf563a40f2fceaf9466290ca/[Source at the release commit]
 * link:https://github.com/rust-lang/rust/blob/master/src/doc/style-guide/src/editions.md[Rust style editions], The Rust Style Guide. link:https://web.archive.org/web/20250520035929/https://github.com/rust-lang/rust/blob/master/src/doc/style-guide/src/editions.md[Archived copy]
 * link:https://agents.md/[AGENTS.md], open format for coding agents. link:https://web.archive.org/web/20261117200853/https://agents.md/[Archived copy]
 * link:https://best.openssf.org/Security-Focused-Guide-for-AI-Code-Assistant-Instructions[Security-Focused Guide for AI Code Assistant Instructions], Open Source Security Foundation. link:https://web.archive.org/web/20261005132941/https://best.openssf.org/Security-Focused-Guide-for-AI-Code-Assistant-Instructions[Archived copy]

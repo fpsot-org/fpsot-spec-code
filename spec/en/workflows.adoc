@@ -53,7 +53,10 @@ The files `examples/zizmor.yml` and `examples/workflow-lint.yml` show a setup.
 [[COD-804]]
 *COD-804.* A project MUST build its release artifacts in a reusable workflow.
 That workflow MUST attest where each artifact and its software bill of materials come from.
+A project SHOULD call the shared release workflow of {abbr-fpsot-first}, once the `fpsot-org/GitHub-Actions` repository offers one for code.
 Check: review of the release workflow.
+
+That repository already releases specifications through its reusable workflow `spec-release.yml`, the pattern that a release workflow for code follows.
 
 link:https://docs.github.com/en/actions/concepts/security/artifact-attestations[GitHub artifact attestations] give Build Level 2 of SLSA, which SEC-035 asks for.
 In a reusable workflow, they give Build Level 3.
@@ -61,7 +64,8 @@ In a reusable workflow, they give Build Level 3.
 [[COD-805]]
 *COD-805.* Each job that runs steps MUST set `timeout-minutes`.
 Each workflow that deploys or releases MUST set `concurrency`.
-Check: review.
+Check: a {abbr-ci-first} search for `timeout-minutes` in each job that has `steps`, as in `examples/check-examples.py`.
+Review checks `concurrency`.
 
 [[COD-806]]
 *COD-806.* A project SHOULD run OpenSSF Scorecard and publish its score.

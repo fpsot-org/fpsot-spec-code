@@ -27,9 +27,24 @@ A test can call the default class without a container.
 ----
 package org.fpsot.example.rules;
 
+import java.math.BigDecimal;
+
+public record Household(BigDecimal income, BigDecimal limit) {
+}
+----
+
+[source,java]
+----
+package org.fpsot.example.rules;
+
 public interface IncomeLimit {
     boolean exceeds(Household household);
 }
+----
+
+[source,java]
+----
+package org.fpsot.example.rules;
 
 public final class DefaultIncomeLimit implements IncomeLimit {
     @Override
@@ -47,6 +62,13 @@ The annotation `@DefaultBean` makes the bean back off when the application suppl
 [source,java]
 ----
 package org.fpsot.example.runtime;
+
+import io.quarkus.arc.DefaultBean;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.inject.Produces;
+import org.fpsot.example.rules.DefaultIncomeLimit;
+import org.fpsot.example.rules.IncomeLimit;
 
 @Dependent
 class IncomeLimitProducer {
@@ -81,6 +103,14 @@ An ArchUnit test in the rule module proves that it imports no framework package.
 
 [source,java]
 ----
+package org.fpsot.example.rules;
+
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+
+import com.tngtech.archunit.junit.AnalyzeClasses;
+import com.tngtech.archunit.junit.ArchTest;
+import com.tngtech.archunit.lang.ArchRule;
+
 @AnalyzeClasses(packages = "org.fpsot.example.rules")
 class RuleModuleTest {
     @ArchTest

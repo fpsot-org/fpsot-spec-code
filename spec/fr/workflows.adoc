@@ -54,7 +54,12 @@ Les fichiers `examples/zizmor.yml` et `examples/workflow-lint.yml` montrent une 
 [[COD-804]]
 *COD-804.* Un projet DOIT construire les artefacts de ses versions dans un flux de travail réutilisable.
 Ce flux de travail DOIT attester la provenance de chaque artefact et de sa nomenclature logicielle.
+Un projet DEVRAIT appeler le flux de travail de publication commun de la {abbr-fpsot-first}.
+Il le fait dès que le dépôt `fpsot-org/GitHub-Actions` en offre un pour le code.
 Vérification : revue du flux de travail de publication.
+
+Ce dépôt publie déjà les spécifications au moyen de son flux de travail réutilisable `spec-release.yml`.
+Un flux de publication pour le code suit ce modèle.
 
 Les link:https://docs.github.com/en/actions/concepts/security/artifact-attestations[attestations d’artefacts de GitHub] donnent le niveau de construction 2 de SLSA, qu’exige SEC-035.
 Dans un flux de travail réutilisable, elles donnent le niveau 3.
@@ -62,7 +67,8 @@ Dans un flux de travail réutilisable, elles donnent le niveau 3.
 [[COD-805]]
 *COD-805.* Chaque tâche qui exécute des étapes DOIT fixer `timeout-minutes`.
 Chaque flux de travail qui déploie ou publie DOIT fixer `concurrency`.
-Vérification : revue.
+Vérification : une recherche par l’{abbr-ci-first} de `timeout-minutes` dans chaque tâche qui a des `steps`.
+Le script `examples/check-examples.py` en montre une, et la revue vérifie `concurrency`.
 
 [[COD-806]]
 *COD-806.* Un projet DEVRAIT exécuter OpenSSF Scorecard et publier son résultat.

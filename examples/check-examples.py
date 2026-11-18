@@ -351,6 +351,10 @@ def check_enforcer(r, path):
         r.err(path.name, "the plugin version must be pinned (COD-108)")
     rules = root.find(".//m:configuration/m:rules", ns)
     names = {child.tag.split("}")[-1] for child in (rules if rules is not None else [])}
+    prop = rules.find("m:requireProperty", ns) if rules is not None else None
+    if prop is None or prop.findtext("m:property", namespaces=ns) != "maven.compiler.release" \
+            or prop.findtext("m:regex", namespaces=ns) != "21":
+        r.err(path.name, "requireProperty must fix maven.compiler.release to 21 (COD-100)")
     for rule in ("requireMavenVersion", "requireJavaVersion", "requirePluginVersions",
                  "dependencyConvergence", "banDynamicVersions"):
         if rule not in names:
@@ -366,8 +370,26 @@ def check_eslint(r, path):
         r.err(path.name, "must be a flat configuration with a default export (COD-603)")
     if "strictTypeChecked" not in text:
         r.err(path.name, "must use the strictTypeChecked set of typescript-eslint (COD-603)")
+    if not re.search(r"files:\s*\[[^\]]*\*\*/\*\.\{js,mjs,cjs\}[^\]]*\]\s*,\s*\.\.\.tseslint\.configs\.disableTypeChecked", text):
+        r.err(path.name, "JavaScript files must turn off the type-checked rules (COD-603)")
     if not re.search(r"eslint-comments/require-description\"\s*:\s*\"error\"", text):
         r.err(path.name, "eslint-comments/require-description must be an error (COD-010)")
+
+
+def check_shellcheckrc(r, path):
+    enabled = set()
+    for n, line in enumerate(path.read_text(encoding="utf-8").split("\n"), 1):
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        key, sep, value = line.partition("=")
+        if not sep or not re.fullmatch(r"[a-z-]+", key.strip()):
+            r.err(path.name, f"line {n} is not a key=value setting")
+            continue
+        if key.strip() == "enable":
+            enabled.update(v.strip() for v in value.split(","))
+    if "require-double-brackets" not in enabled:
+        r.err(path.name, "enable=require-double-brackets is missing (COD-502)")
 
 
 def check_psd1(r, path):
@@ -405,7 +427,7 @@ def main(argv):
     ex = root / "examples"
     r = Report()
     expected = list(YAML_CHECKS) + [".editorconfig", "maven-enforcer.xml", "eslint.config.mjs",
-                                    "PSScriptAnalyzerSettings.psd1"]
+                                    "PSScriptAnalyzerSettings.psd1", ".shellcheckrc"]
     for name in expected:
         if not (ex / name).is_file():
             r.err(name, "missing")
@@ -436,6 +458,8 @@ def main(argv):
         check_enforcer(r, ex / "maven-enforcer.xml")
     if (ex / "eslint.config.mjs").is_file():
         check_eslint(r, ex / "eslint.config.mjs")
+    if (ex / ".shellcheckrc").is_file():
+        check_shellcheckrc(r, ex / ".shellcheckrc")
     if (ex / "PSScriptAnalyzerSettings.psd1").is_file():
         check_psd1(r, ex / "PSScriptAnalyzerSettings.psd1")
     for e in r.errors:

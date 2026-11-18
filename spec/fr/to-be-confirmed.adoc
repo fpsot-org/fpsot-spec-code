@@ -23,8 +23,9 @@ Elles portent sur les sujets suivants.
 |11 et 12 |Fonctions en Go : résultats nommés, et récepteurs par valeur ou par pointeur.
 |===
 
-Deux règles de cette spécification touchent aux mêmes sujets, mais reposent sur d’autres sources.
+Trois règles de cette spécification touchent aux mêmes sujets.
 COD-112 interdit de mettre les fils virtuels en réserve, d’après la JEP 444.
+COD-405 n’impose que ce que vérifient `go vet` et `errorlint`, et garde le choix entre `%w` et `%v` comme recommandation.
 COD-105 rend les exceptions Java non vérifiées.
 Elle suit le modèle d’erreurs que la personne responsable a approuvé pour Java et Kotlin ensemble.
 

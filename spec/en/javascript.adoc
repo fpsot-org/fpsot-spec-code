@@ -24,6 +24,7 @@ The review comes after six months because TypeScript and its linter are between 
 |ESLint |10.15.0 |Lints code, with the flat configuration only.
 |typescript-eslint |8.73.0 |Adds rules that read types.
 |Prettier |3.10.1 |Formats code.
+|Vitest, or `node:test` |5.1.1, or the version of Node.js |Runs tests.
 |===
 
 == Rules
@@ -32,7 +33,7 @@ The review comes after six months because TypeScript and its linter are between 
 *COD-600.* New work MUST run on Node.js 26.
 A project MUST run only on a line of Node.js in active or maintenance long-term support.
 It MUST declare the line in the `engines` field of `package.json` and in a `.node-version` file.
-Check: `npm ci`, which warns on a wrong engine, and review of the {abbr-ci-first} jobs.
+Check: `npm ci` with `engine-strict=true`, which fails on a wrong engine, and review of the {abbr-ci-first} jobs.
 
 The link:https://nodejs.org/en/about/previous-releases[Node.js releases page] lists each line and its end date.
 From Node.js 27, link:https://nodejs.org/en/blog/announcements/evolving-the-nodejs-release-schedule[one major release a year] ships, and each one becomes a long-term release.
@@ -68,10 +69,12 @@ The file `examples/eslint.config.mjs` shows a conforming configuration.
 
 [[COD-604]]
 *COD-604.* A project MUST commit its lock file and install with `npm ci`.
-Its `.npmrc` file MUST set `ignore-scripts=true`, `allow-git=none` and `min-release-age` to at least 3 days.
+Its `.npmrc` file MUST set `ignore-scripts=true`, `allow-git=none` and `engine-strict=true`.
+It MUST also set `min-release-age` to at least 3 days.
 Check: review of `.npmrc` and of the {abbr-ci} jobs.
 
 These link:https://docs.npmjs.com/cli/v11/using-npm/config[npm settings] are the npm mechanism for SEC-030 and SEC-032.
+TST-006 leaves the test runner open, and this page names Vitest or the `node:test` module of Node.js.
 A waiting period gives the registry time to remove a malicious release before a project installs it.
 
 [[COD-605]]
