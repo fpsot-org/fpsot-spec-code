@@ -1,0 +1,180 @@
+= Quarkus
+include::_fpsot-terms.adoc[]
+
+This page covers Quarkus applications and Quarkus extensions, in Java or in Kotlin.
+Their code also follows the xref:java.adoc[Java] page, or the xref:kotlin.adoc[Kotlin] page.
+
+[cols="1,3"]
+|===
+|Owner role |Quarkus lead of the Working Group
+|Last reviewed |2026-11-18
+|Review by |2027-03-18
+|===
+
+The review comes early because Quarkus 4 is close to its first final release.
+
+== Tools of edition 2026
+
+[cols="2,1,3",options="header"]
+|===
+|Tool |Version |Role
+|Quarkus |3.40 long-term support |Main line.
+|Quarkus |4.0 |Compatibility job, once the final release ships.
+|Mandrel |25 |Builds native executables.
+|quarkus-cyclonedx |the version in the Quarkus platform |Writes the software bill of materials.
+|===
+
+== Versions
+
+[[COD-200]]
+*COD-200.* The main line of a project MUST use the current long-term support release of Quarkus.
+For this edition, that release is 3.40.
+The {abbr-ci-first} SHOULD also test on the latest Quarkus release.
+Check: review of the platform version and of the {abbr-ci} jobs.
+
+The link:https://quarkus.io/releases/[Quarkus releases page] gives 3.40 as the current long-term support release, with support until 2027-09-30.
+Each long-term release gets 12 months of fixes.
+A project moves to the next one within that time.
+
+Quarkus 4.0 brings large changes, such as Jakarta REST 4, Jakarta Persistence 4.0 and Jackson 3.
+The Quarkus team plans its final release for the end of November 2026.
+Once it ships, projects add a {abbr-ci} job on 4.x that does not block a merge.
+The main line moves to 4.x once a 4.x release has long-term support.
+The research for this specification did not find whether 4.0 itself will have it.
+
+== Extensions
+
+[[COD-201]]
+*COD-201.* An extension MUST have a runtime module and a deployment module.
+The runtime module MUST NOT depend on a deployment artifact.
+Check: a `bannedDependencies` rule of the Maven Enforcer Plugin on the runtime module, which bans `+*-deployment+` artifacts.
+
+[[COD-202]]
+*COD-202.* Build steps MUST talk to each other only through build items.
+A build step MUST NOT load an application class.
+It reads classes through the Jandex index instead.
+Check: review.
+
+The link:https://quarkus.io/guides/writing-extensions[guide on writing extensions] sets this model.
+Recorders that start servers or threads belong at run time, not at static initialization.
+
+[[COD-203]]
+*COD-203.* Extension configuration MUST use `@ConfigMapping` with `@ConfigRoot`, which names its phase.
+Its keys MUST sit under `quarkus.<extension>`.
+Each property MUST have Javadoc whose first sentence stands alone.
+Application configuration MUST use `@ConfigMapping` with its own prefix, never `quarkus.`.
+Check: review.
+
+Secrets never go in `application.properties`, under SEC-020.
+
+[[COD-204]]
+*COD-204.* Beans MUST receive their dependencies through their constructor.
+Injected fields, producer methods and observer methods MUST be package-private, not private.
+This overrides the habit of private members in plain Java.
+Check: an ArchUnit test, or review.
+
+The link:https://quarkus.io/guides/cdi-reference[Quarkus CDI reference] explains that a private member forces the use of reflection.
+Reflection costs time at startup and needs extra setup in a native image.
+
+[[COD-205]]
+*COD-205.* The domain and port packages of a library of the {abbr-fpsot-first} MUST NOT import `+jakarta.*+` or `+io.quarkus.*+`.
+This extends the package rule of COD-114 to the framework.
+Check: an ArchUnit test, under COD-104.
+
+Domain code without framework imports runs in any Java program and tests without a container.
+
+[[COD-206]]
+*COD-206.* Library and extension code MUST NOT look up beans through `CDI.current()` or `Arc.container()`.
+A bean that only code outside CDI injection reaches MUST carry `@Unremovable`.
+Otherwise, its extension MUST produce an `UnremovableBeanBuildItem` for it.
+Check: an ArchUnit test, or review.
+
+Quarkus removes unused beans at build time.
+The link:https://quarkus.io/guides/cdi-reference[CDI reference] explains that Quarkus keeps each bean that an injection point of `Instance<T>` or `Provider<T>` can reach.
+A programmatic lookup through `CDI.current()` escapes that analysis, and the bean may be gone.
+
+[[COD-207]]
+*COD-207.* An extension MUST register the classes and resources that a native image needs through build items.
+`ReflectiveClassBuildItem`, `NativeImageResourceBuildItem` and `ServiceProviderBuildItem` serve that purpose.
+Only an application MAY use `@RegisterForReflection`.
+A team MUST review metadata that a tracing agent generates before it commits that metadata.
+Check: review.
+
+[[COD-208]]
+*COD-208.* Each extension MUST declare an honest `status` in `quarkus-extension.yaml`: `stable`, `preview` or `experimental`.
+It MUST declare one feature, and MUST query capabilities rather than probe the class path.
+Its deployment module MUST test it with a `QuarkusExtensionTest` field.
+Check: review, and the tests of the deployment module.
+
+== Native images
+
+[[COD-209]]
+*COD-209.* A native build MUST use a Mandrel 25 builder image pinned by digest, under SEC-031.
+It MUST use the same major version of the JDK as the build on the JVM.
+It MUST set `quarkus.native.native-image-xmx` and the `--parallelism` option of `native-image`.
+Check: review of the build configuration.
+
+The link:https://quarkus.io/guides/building-native-image[guide on native images] makes Mandrel the default builder for Linux containers.
+Since Quarkus 3.36, the link:https://quarkus.io/blog/mandrel-25-minimum-version/[minimum version of GraalVM and Mandrel] is 25.0.
+Explicit limits make the result independent of the size of the runner.
+
+[[COD-210]]
+*COD-210.* The release workflow MUST run the tests marked `@QuarkusIntegrationTest` against the native executable, with `./mvnw verify -Dnative`.
+Check: the release workflow.
+
+This is how a native artifact meets TST-065.
+
+[[COD-211]]
+*COD-211.* An application MUST write its software bill of materials with the `quarkus-cyclonedx` extension.
+Libraries and extensions MUST ship Java archives only, never native executables.
+Check: the release workflow.
+
+The link:https://quarkus.io/guides/cyclonedx[Quarkus CycloneDX guide] makes the executable the main component of the bill.
+The bill then comes from the build, as SEC-034 asks.
+Libraries and extensions ship Java archives, and the Maven plugin of CycloneDX writes their bill.
+
+== Tests and logs
+
+[[COD-212]]
+*COD-212.* Tests of an application SHOULD use Dev Services for their dependencies.
+Tests of a plain library SHOULD use Testcontainers.
+Unit tests of beans SHOULD use `@QuarkusComponentTest`.
+Check: review.
+
+TST-014 already forbids an in-memory stand-in for a real database.
+link:https://quarkus.io/guides/dev-services[Dev Services] start the real product in a container.
+A link:https://quarkus.io/guides/testing-components[component test] starts only the container of beans, not the whole application.
+
+[[COD-213]]
+*COD-213.* Libraries and extensions SHOULD log through `org.jboss.logging.Logger`.
+Only application classes MAY use `io.quarkus.logging.Log`.
+Check: an ArchUnit test, or review.
+
+The link:https://quarkus.io/guides/logging[Quarkus logging guide] says that `Log` depends on a rewrite at build time.
+It advises against `Log` in extensions and outside dependencies.
+The form of each log record follows OBS-020 and OBS-080.
+
+== References
+
+=== Normative
+
+* link:https://quarkus.io/releases/[Releases], Quarkus. link:https://web.archive.org/web/20261111141822/https://quarkus.io/releases/[Archived copy]
+* link:https://quarkus.io/guides/writing-extensions[Writing your own extension], Quarkus guides. link:https://web.archive.org/web/20261111141748/https://quarkus.io/guides/writing-extensions/[Archived copy]
+* link:https://quarkus.io/guides/cdi-reference[Contexts and Dependency Injection], Quarkus guides. link:https://web.archive.org/web/20261111141800/https://quarkus.io/guides/cdi-reference/[Archived copy]
+* link:https://quarkus.io/guides/building-native-image[Building a native executable], Quarkus guides. link:https://web.archive.org/web/20261110031411/https://quarkus.io/guides/building-native-image/[Archived copy]
+* link:https://quarkus.io/guides/cyclonedx[Generating and using CycloneDX SBOMs], Quarkus guides. link:https://web.archive.org/web/20260411212020/https://quarkus.io/guides/cyclonedx[Archived copy]
+
+=== Informative
+
+* link:https://quarkus.io/blog/mandrel-25-minimum-version/[Bumping the minimum officially supported GraalVM version to 25.0], Quarkus blog. link:https://web.archive.org/web/20260618011843/https://quarkus.io/blog/mandrel-25-minimum-version/[Archived copy]
+* link:https://quarkus.io/guides/dev-services[Dev Services overview], Quarkus guides. link:https://web.archive.org/web/20261111141758/https://quarkus.io/guides/dev-services/[Archived copy]
+* link:https://quarkus.io/guides/testing-components[Testing components], Quarkus guides. link:https://web.archive.org/web/20260617101952/https://quarkus.io/guides/testing-components[Archived copy]
+* link:https://quarkus.io/guides/logging[Logging configuration], Quarkus guides. link:https://web.archive.org/web/20261104131334/https://quarkus.io/guides/logging/[Archived copy]
+
+== Document history
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Change
+|0.1.0 |2026-11-18 |First version.
+|===

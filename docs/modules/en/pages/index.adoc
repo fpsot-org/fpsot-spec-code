@@ -1,15 +1,72 @@
-= Guide
-:page-type: explanation
+= Put a repository under the code specification
+:page-type: how-to
 include::_fpsot-terms.adoc[]
 
-This page explains the specification for the people who adopt it.
-Each guide page has one type.
-It is a tutorial, a how-to guide, a reference or an explanation.
+This guide takes one software {term-repository} to conformance with the code specification.
+Each step cites the rule it meets.
+The files in `examples/` give a starting point for each tool.
+
+== List the languages
+
+List each language and file type that the {term-repository} holds, under COD-004.
+Count the build files and the scripts too.
+Templates, container files, workflows and configuration files count as well.
+Each item on the list brings its own page of the specification.
+
+== Add the shared files
+
+Copy `examples/.editorconfig` to the root, and adjust the sections to your languages, under COD-015.
+Add an `SPDX-License-Identifier` line at the top of each source file, under COD-014.
+State the style edition in `CONTRIBUTING.md`, under COD-019.
+For version 0.1 of the specification, the edition is 2026.
+
+== Pin the tools
+
+For each language, pin the formatter and the linters that its page names, and commit their settings, under COD-002.
+
+* Java and Quarkus: add the rules of `examples/maven-enforcer.xml`, and the formatter and import sort plugins, under COD-102 and COD-108.
+* Go: copy `examples/.golangci.yml`, under COD-401.
+* JavaScript and TypeScript: copy `examples/eslint.config.mjs`, under COD-603.
+* PowerShell: copy `examples/PSScriptAnalyzerSettings.psd1`, under COD-551.
+* Container files: copy `examples/.hadolint.yaml`, under COD-750.
+* YAML: copy `examples/.yamllint.yaml`, under COD-850.
+
+Declare the version of each toolchain in the file that its page names, under COD-016.
+
+== Run the checks in CI
+
+Add one job per language that runs the formatter in check mode and the linters, under COD-002.
+Make each job a required check of the protected branches.
+Copy `examples/workflow-lint.yml` and `examples/zizmor.yml` to check the workflows themselves, under COD-803.
+
+The first run usually finds many issues.
+Reformat the code in one {term-commit} that does nothing else, under COD-019.
+Fix the linter findings in later commits.
+A finding that you must keep needs a comment that names the rule and gives the reason, under COD-010.
+
+== Prepare the release
+
+Name the release files as COD-021 asks.
+Tools then find the software bill of materials, the provenance and the signature.
+Make the build of Java archives and Go binaries reproducible, under COD-022, COD-109 and COD-404.
+
+== Check the example files
+
+Run the check of the example files after you change one of them.
+
+[source,text]
+----
+bash examples/test-examples.sh
+----
+
+The check needs Python 3.11 or later and no other package.
+It shows that each example parses and holds the settings that its rules ask for.
+It does not run the tools themselves.
 
 == Document history
 
 [cols="1,1,4",options="header"]
 |===
 |Version |Date |Change
-|0.1.0 |2026-11-03 |First version.
+|0.1.0 |2026-11-18 |First version.
 |===

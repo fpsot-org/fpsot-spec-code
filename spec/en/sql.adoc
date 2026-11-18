@@ -1,0 +1,105 @@
+= SQL
+include::_fpsot-terms.adoc[]
+
+This page covers {abbr-sql-first} queries and database migrations.
+{abbr-fpsot-first} builds on PostgreSQL.
+
+[cols="1,3"]
+|===
+|Owner role |Data lead of the Working Group
+|Last reviewed |2026-11-18
+|Review by |2027-11-18
+|===
+
+== Tools of edition 2026
+
+[cols="2,1,3",options="header"]
+|===
+|Tool |Version |Role
+|PostgreSQL |18, or 17 |Runs the database.
+|Flyway Community, through `quarkus-flyway` |the version in the Quarkus platform |Applies migrations.
+|sqlfluff |4.5.0 |Lints {abbr-sql} files.
+|===
+
+== Rules
+
+[[COD-700]]
+*COD-700.* A new system MUST use PostgreSQL 18, and MAY use 17.
+A system MUST NOT run a major version past its end of life.
+Check: review of the deployment and of the container images.
+
+The link:https://www.postgresql.org/support/versioning/[PostgreSQL versioning policy] supports each major version for five years.
+PostgreSQL 14 reached its end of life on 2026-11-12.
+
+[[COD-701]]
+*COD-701.* Migrations MUST use Flyway.
+A project MUST NOT adopt Liquibase 5 until a review of its license approves it.
+Check: review of the dependencies.
+
+link:https://www.liquibase.com/blog/liquibase-community-for-the-future-fsl[Liquibase announced] a move of its community edition to the Functional Source License.
+The research for this specification did not verify the terms at the source.
+If confirmed, that license would not fit a foundation that releases code under Apache 2.0.
+
+[[COD-702]]
+*COD-702.* A migration MUST NOT change once a shared environment has applied it.
+Every profile except tests MUST set `quarkus.flyway.clean-disabled=true`.
+Production MUST migrate in a separate job before the new version starts, not at the start of each replica.
+Check: Flyway validates applied migrations at start, and review of the profiles.
+
+The link:https://quarkus.io/guides/flyway[Quarkus guide on Flyway] leaves `clean-disabled` false by default.
+It also explains why each replica should not migrate, and the Kubernetes manifests that Quarkus generates include such a job.
+
+[[COD-703]]
+*COD-703.* A migration MUST work with the previous release of the application, so that both versions run during a rollout.
+A change that breaks the previous release MUST happen in steps: expand, move the data, then contract.
+Large tables MUST use `CREATE INDEX CONCURRENTLY`, and new constraints with `NOT VALID` followed by `VALIDATE CONSTRAINT`.
+Each migration MUST set `lock_timeout`.
+Check: review.
+
+The pages on link:https://www.postgresql.org/docs/current/sql-createindex.html[CREATE INDEX] and link:https://www.postgresql.org/docs/current/sql-altertable.html[ALTER TABLE] describe these forms.
+`CREATE INDEX CONCURRENTLY` cannot run inside a transaction block.
+Flyway Community has no undo migrations, so a fix goes forward as a new migration.
+
+[[COD-704]]
+*COD-704.* Code MUST pass each value to a query as a parameter, never by joining strings.
+A table or column name that comes from input MUST match an allow-list in the code.
+Check: SpotBugs with Find Security Bugs, gosec and review.
+
+These rules block link:https://cwe.mitre.org/data/definitions/89.html[SQL injection, CWE-89], the second weakness of the 2025 list.
+
+[[COD-705]]
+*COD-705.* {abbr-sql} files MUST pass sqlfluff with the `postgres` dialect and a committed configuration.
+Check: link:https://docs.sqlfluff.com/en/stable/[sqlfluff] in {abbr-ci-first}.
+
+[[COD-706]]
+*COD-706.* Tables SHOULD use identity columns of the form `GENERATED ALWAYS AS IDENTITY` rather than `serial` types.
+Instants SHOULD use `timestamptz`, and columns SHOULD be `NOT NULL` unless a value can be absent.
+Table and column names MUST be in snake_case.
+They MUST also meet NAM-004, NAM-009 and NAM-013.
+Check: review.
+
+The naming specification has no row for {abbr-sql} identifiers yet, so this page sets their case for now.
+That part moves to the naming specification once it has such a row.
+
+== References
+
+=== Normative
+
+* link:https://www.postgresql.org/support/versioning/[Versioning Policy], PostgreSQL Global Development Group. link:https://web.archive.org/web/20261116175759/https://www.postgresql.org/support/versioning/[Archived copy]
+* link:https://quarkus.io/guides/flyway[Using Flyway], Quarkus guides. link:https://web.archive.org/web/20260822081431/https://quarkus.io/guides/flyway[Archived copy]
+* link:https://www.postgresql.org/docs/current/sql-createindex.html[CREATE INDEX], PostgreSQL 18 documentation. link:https://web.archive.org/web/20261110052901/https://www.postgresql.org/docs/current/sql-createindex.html[Archived copy]
+* link:https://www.postgresql.org/docs/current/sql-altertable.html[ALTER TABLE], PostgreSQL 18 documentation. link:https://web.archive.org/web/20261116164002/https://www.postgresql.org/docs/current/sql-altertable.html[Archived copy]
+* link:https://docs.sqlfluff.com/en/stable/[SQLFluff], version 4.5.0. link:https://web.archive.org/web/20261115183538/https://docs.sqlfluff.com/en/stable/[Archived copy]
+
+=== Informative
+
+* link:https://www.liquibase.com/blog/liquibase-community-for-the-future-fsl[Liquibase Community for the future], Liquibase blog. link:https://web.archive.org/web/20260702192440/https://www.liquibase.com/blog/liquibase-community-for-the-future-fsl[Archived copy]
+* link:https://cwe.mitre.org/data/definitions/89.html[CWE-89: Improper Neutralization of Special Elements used in an SQL Command], MITRE. link:https://web.archive.org/web/20261117081802/https://cwe.mitre.org/data/definitions/89.html[Archived copy]
+
+== Document history
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Change
+|0.1.0 |2026-11-18 |First version.
+|===

@@ -1,0 +1,105 @@
+= Flux de travail d’intégration continue
+include::_fpsot-terms.adoc[]
+
+Cette page vise les flux de travail de GitHub Actions.
+Un flux de travail s’exécute avec les droits du {term-repository}, si bien que ses erreurs deviennent des failles de sécurité.
+
+[cols="1,3"]
+|===
+|Rôle responsable |Responsable de la plateforme du groupe de travail
+|Dernière révision |2026-11-18
+|Réviser au plus tard le |2027-05-18
+|===
+
+== Outils de l’édition 2026
+
+[cols="2,1,3",options="header"]
+|===
+|Outil |Version |Rôle
+|actionlint |1.7.12 |Vérifie la syntaxe et les expressions des flux de travail.
+|zizmor |1.32.0 |Cherche les failles de sécurité des flux de travail.
+|===
+
+== Règles
+
+[[COD-800]]
+*COD-800.* Chaque flux de travail DOIT fixer `permissions` à son niveau supérieur, à `{}` ou à `contents: read`.
+Une tâche qui a besoin de plus DOIT élever ses propres permissions seulement.
+Vérification : l’audit `excessive-permissions` de zizmor.
+
+Le link:https://docs.github.com/en/actions/reference/security/secure-use[guide de GitHub sur l’utilisation sécuritaire] demande le moins de permissions possible pour le jeton de chaque tâche.
+C’est ainsi qu’un flux de travail respecte SEC-024.
+
+[[COD-801]]
+*COD-801.* Chaque extraction du code DOIT fixer `persist-credentials: false`.
+Une étape `run` NE DOIT PAS développer une expression que contrôle une personne externe, comme `${{ github.event.issue.title }}`.
+Elle DOIT plutôt passer cette valeur par une variable d’environnement.
+Vérification : les audits `artipacked` et `template-injection` de zizmor.
+
+[[COD-802]]
+*COD-802.* Un flux de travail déclenché par `pull_request_target` ou `workflow_run` NE DOIT PAS extraire le code d’une demande de tirage.
+Il NE DOIT PAS non plus exécuter ce code.
+Vérification : l’audit `dangerous-triggers` de zizmor, et revue.
+
+[[COD-803]]
+*COD-803.* actionlint et zizmor DOIVENT s’exécuter comme vérifications requises sur chaque demande de tirage qui modifie un flux de travail.
+La configuration de zizmor DOIT exiger un épinglage par empreinte pour chaque action externe, selon SEC-031.
+Vérification : les vérifications requises des branches protégées.
+
+L’outil link:https://github.com/rhysd/actionlint[actionlint] vérifie la syntaxe et exécute ShellCheck sur les étapes `run`.
+Les link:https://docs.zizmor.sh/audits/[audits de zizmor] couvrent les actions non épinglées et les permissions trop larges.
+Ils couvrent aussi les déclencheurs dangereux et l’injection par gabarit.
+Les fichiers `examples/zizmor.yml` et `examples/workflow-lint.yml` montrent une configuration.
+
+[[COD-804]]
+*COD-804.* Un projet DOIT construire les artefacts de ses versions dans un flux de travail réutilisable.
+Ce flux de travail DOIT attester la provenance de chaque artefact et de sa nomenclature logicielle.
+Un projet DEVRAIT appeler le flux de travail de publication commun de la {abbr-fpsot-first}.
+Il le fait dès que le dépôt `fpsot-org/GitHub-Actions` en offre un pour le code.
+Vérification : revue du flux de travail de publication.
+
+Ce dépôt publie déjà les spécifications au moyen de son flux de travail réutilisable `spec-release.yml`.
+Un flux de publication pour le code suit ce modèle.
+
+Les link:https://docs.github.com/en/actions/concepts/security/artifact-attestations[attestations d’artefacts de GitHub] donnent le niveau de construction 2 de SLSA, qu’exige SEC-035.
+Dans un flux de travail réutilisable, elles donnent le niveau 3.
+
+[[COD-805]]
+*COD-805.* Chaque tâche qui exécute des étapes DOIT fixer `timeout-minutes`.
+Chaque flux de travail qui déploie ou publie DOIT fixer `concurrency`.
+Vérification : une recherche par l’{abbr-ci-first} de `timeout-minutes` dans chaque tâche qui a des `steps`.
+Le script `examples/check-examples.py` en montre une, et la revue vérifie `concurrency`.
+
+[[COD-806]]
+*COD-806.* Un projet DEVRAIT exécuter OpenSSF Scorecard et publier son résultat.
+Vérification : le flux de travail link:https://github.com/ossf/scorecard[Scorecard].
+
+== Fichiers de verrouillage des flux de travail
+
+GitHub a annoncé les fichiers de verrouillage des flux de travail en préversion publique le link:https://github.blog/changelog/2026-10-14-github-actions-workflow-lockfiles-in-public-preview/[2026-10-14].
+Un tel fichier peut remplacer l’épinglage par empreinte.
+Les comptes rendus sur leur disponibilité générale se contredisent, et les forfaits visés restent flous.
+L’épinglage par empreinte selon SEC-031 demeure la règle.
+Une édition ultérieure passera aux fichiers de verrouillage quand ils seront offerts à tous sur les forfaits gratuit et Team.
+
+== Références
+
+=== Références normatives
+
+* link:https://docs.github.com/en/actions/reference/security/secure-use[Secure use reference], GitHub Docs. link:https://web.archive.org/web/20261112081530/https://docs.github.com/en/actions/reference/security/secure-use[Copie archivée]
+* link:https://docs.zizmor.sh/audits/[Audit Rules], zizmor, version 1.32.0. link:https://web.archive.org/web/20261117041308/https://docs.zizmor.sh/audits/[Copie archivée]
+* link:https://github.com/rhysd/actionlint[actionlint], version 1.7.12, 2026-03-30. link:https://web.archive.org/web/20261027101138/https://github.com/rhysd/actionlint[Copie archivée]
+* link:https://docs.github.com/en/actions/concepts/security/artifact-attestations[Artifact attestations], GitHub Docs. link:https://web.archive.org/web/20261104200549/https://docs.github.com/en/actions/concepts/security/artifact-attestations[Copie archivée]
+
+=== Références informatives
+
+* link:https://github.com/ossf/scorecard[OpenSSF Scorecard], version 5.6.0. link:https://web.archive.org/web/20261030095710/https://github.com/ossf/scorecard[Copie archivée]
+* link:https://github.blog/changelog/2026-10-14-github-actions-workflow-lockfiles-in-public-preview/[GitHub Actions workflow lockfiles in public preview], GitHub Changelog, 2026-10-14. link:https://web.archive.org/web/20261105185839/https://github.blog/changelog/2026-10-14-github-actions-workflow-lockfiles-in-public-preview/[Copie archivée]
+
+== Historique du document
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Changement
+|0.1.0 |2026-11-18 |Première version.
+|===

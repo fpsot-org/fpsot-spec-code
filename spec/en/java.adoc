@@ -1,0 +1,220 @@
+= Java
+include::_fpsot-terms.adoc[]
+
+This page covers Java code, its Maven build and its release to Maven Central.
+Code that runs on Quarkus also follows the xref:quarkus.adoc[Quarkus] page.
+
+[cols="1,3"]
+|===
+|Owner role |Java lead of the Working Group
+|Last reviewed |2026-11-18
+|Review by |2027-05-18
+|===
+
+== Tools of edition 2026
+
+[cols="2,1,3",options="header"]
+|===
+|Tool |Version |Role
+|JDK |25 |Builds and tests. The code targets Java 21.
+|Maven |3.10.1 or later |Builds, through the Maven Wrapper.
+|formatter-maven-plugin with the Quarkus formatter settings |2.29.0 |Formats code.
+|impsort-maven-plugin |1.13.0 |Sorts imports.
+|Error Prone |2.52.0 |Finds bug patterns at compile time.
+|NullAway |0.14.4 |Checks nullness.
+|JSpecify |1.0.1 |Nullness annotations.
+|SpotBugs Maven plugin with Find Security Bugs |4.10.5.0 and 1.14.0 |Finds bugs and security weaknesses in bytecode.
+|ArchUnit |1.5.1 |Tests architecture rules.
+|JUnit Jupiter |6.1.3 |Runs the tests.
+|Maven Enforcer Plugin |3.7.0 |Checks versions and dependencies.
+|japicmp Maven plugin |0.27.0 |Compares the public interface with the last release.
+|===
+
+== Versions
+
+[[COD-100]]
+*COD-100.* Libraries and extensions MUST compile for Java 21, with `maven.compiler.release` set to `21`.
+They MUST build and test on the Java 25 long-term support release.
+The {abbr-ci-first} SHOULD also test on the latest feature release of the JDK.
+That job does not block a merge.
+Check: the rules `requireJavaVersion` and `requireProperty` of the Maven Enforcer Plugin, the latter on `maven.compiler.release` with the value `21`.
+Review checks the {abbr-ci} jobs.
+
+Java 21 is the floor of Quarkus 4, as the link:https://quarkus.io/blog/quarkus-4-0-0-beta1-released/[Quarkus 4.0.0.Beta1 announcement] states.
+Java 25 is the current long-term support release.
+The next review of this page checks the next long-term release.
+
+[[COD-101]]
+*COD-101.* A published artifact MUST NOT use a preview feature of Java.
+Check: a {abbr-ci} search for `--enable-preview` in the build files.
+
+A class file that uses preview features runs only on the exact JDK that compiled it, as link:https://openjdk.org/jeps/12[JEP 12] explains.
+
+== Format and analysis
+
+[[COD-102]]
+*COD-102.* Java code MUST follow the formatter settings of the Quarkus project.
+The formatter and import sort plugins of Maven apply them.
+The {abbr-ci} MUST run the goals `formatter:validate` and `impsort:check`.
+Check: those two goals in the Maven build.
+
+The link:https://github.com/quarkusio/quarkus/blob/main/CONTRIBUTING.md[Quarkus contributing guide] formats code in the build and fails {abbr-ci} on any change.
+The link:https://hub.quarkiverse.io/checklistfornewprojects/[Quarkiverse checklist] asks the same of new extensions.
+An {abbr-fpsot-first} extension can then move to Quarkiverse without a reformat.
+The link:https://code.revelc.net/formatter-maven-plugin/[formatter plugin] and the link:https://code.revelc.net/impsort-maven-plugin/[import sort plugin] do the work.
+
+[[COD-103]]
+*COD-103.* Each package MUST carry the JSpecify annotation `@NullMarked`, in its `package-info.java` file or on the module.
+NullAway MUST run at the error level, with its JSpecify support turned on.
+Check: NullAway, through Error Prone, at compile time.
+
+The link:https://jspecify.dev/docs/user-guide/[JSpecify user guide] makes each unannotated type non-null inside `@NullMarked` code.
+Packages do not nest, so each package needs its own annotation.
+Kotlin reads these annotations, so a Kotlin caller gets types that cannot hold `null`.
+link:https://github.com/uber/NullAway/releases[NullAway] checks them during the build.
+
+[[COD-104]]
+*COD-104.* The Maven build MUST run Error Prone and SpotBugs with the Find Security Bugs plugin.
+Its tests MUST include ArchUnit tests of the package rules of COD-114.
+A project MAY add Checkstyle, but the formatter of COD-102 owns the layout.
+Check: the Maven build.
+
+link:https://github.com/google/error-prone/releases[Error Prone] runs inside the compiler.
+link:https://spotbugs.github.io/[SpotBugs] reads the bytecode, and link:https://find-sec-bugs.github.io/[Find Security Bugs] adds security detectors to it.
+link:https://www.archunit.org/[ArchUnit] states rules on packages and classes as unit tests.
+TST-006 leaves the test runner open, and Java projects use JUnit Jupiter.
+Limits on the length of methods or the number of parameters stay review guidance, not build failures.
+
+== Errors and data
+
+[[COD-105]]
+*COD-105.* An expected business outcome, such as a refusal, MUST be a value of a sealed type.
+The caller MUST handle it with a `switch` that covers each permitted type.
+Exceptions MUST extend `RuntimeException`, and MUST serve bugs and failures of the infrastructure only.
+Code that wraps an exception MUST pass the original as its cause.
+Check: review.
+
+link:https://openjdk.org/jeps/409[Sealed classes], link:https://openjdk.org/jeps/395[records], link:https://openjdk.org/jeps/440[record patterns] and link:https://openjdk.org/jeps/441[pattern matching for switch] let the compiler check that the caller handles each case.
+The Java binding of the decisions specification uses the same shape, under DEC-021.
+Kotlin follows the same model, under COD-303.
+
+[[COD-106]]
+*COD-106.* A method MUST NOT return `null` in place of an empty collection or an empty `Optional`.
+Code MUST NOT use Java serialization to exchange or store data.
+Check: NullAway for `null` returns in code that `@NullMarked` covers, and Find Security Bugs for unsafe deserialization.
+Review covers the rest.
+
+== Build
+
+[[COD-107]]
+*COD-107.* Java and Quarkus projects MUST build with Maven, through the Maven Wrapper.
+The wrapper properties MUST give the checksum of the Maven distribution in `distributionSha256Sum`.
+Gradle is allowed only for Kotlin Multiplatform modules, under COD-304.
+Check: review.
+
+The tools of Quarkus extensions and of Quarkiverse assume Maven.
+The link:https://maven.apache.org/wrapper/[Maven Wrapper] downloads one Maven version and checks it against the committed checksum.
+
+[[COD-108]]
+*COD-108.* The build MUST fix the version of each dependency in `dependencyManagement` or through an imported bill of materials.
+It MUST pin the version of each plugin.
+The Maven Enforcer Plugin MUST run these rules: `requireMavenVersion`, `requireJavaVersion`, `requirePluginVersions`, `dependencyConvergence` and `banDynamicVersions`.
+Check: the link:https://maven.apache.org/enforcer/[Maven Enforcer Plugin].
+
+This is how a Maven build meets SEC-030 without a lock file.
+The file `examples/maven-enforcer.xml` shows the rules.
+The link:https://maven.apache.org/enforcer/enforcer-rules/index.html[list of built-in rules] describes each one.
+
+[[COD-109]]
+*COD-109.* The build MUST set `project.build.outputTimestamp`.
+The release workflow MUST rebuild each release and compare it with the published files, with the goal `artifact:compare`.
+It MUST publish the `.buildinfo` file next to the artifacts.
+Check: the release workflow.
+
+The link:https://maven.apache.org/guides/mini/guide-reproducible-builds.html[Maven guide on reproducible builds] says that Maven 3.10.0 turns on the reproducible mode by default.
+The output depends on the major version of the JDK, so the release workflow pins it.
+This rule meets COD-022.
+
+[[COD-110]]
+*COD-110.* Each published library MUST pass a check of its public interface against its last release, with japicmp or Revapi.
+A change that breaks a caller MUST fail the build unless the major version changes.
+Check: the link:https://github.com/siom79/japicmp[japicmp] Maven plugin in {abbr-ci}.
+
+Release tags follow Semantic Versioning, under VCS-106.
+This check turns that promise into a test.
+
+[[COD-111]]
+*COD-111.* Each library without a `module-info.java` file MUST set `Automatic-Module-Name` in the manifest of its archive.
+The name SHOULD follow NAM-022, which is itself a SHOULD.
+Check: review of the archive manifest.
+
+[[COD-112]]
+*COD-112.* Code MUST NOT pool virtual threads.
+It SHOULD put an explicit limit on each scarce resource that they use.
+A semaphore or the size of a connection pool sets such a limit.
+Check: review.
+
+link:https://openjdk.org/jeps/444[JEP 444] presents virtual threads as cheap, and advises against pooling them.
+Since link:https://openjdk.org/jeps/491[JEP 491] in JDK 24, a `synchronized` block no longer pins a virtual thread to its carrier.
+This page builds on Java 25, so it keeps no rule against `synchronized`.
+
+[[COD-113]]
+*COD-113.* A release to Maven Central MUST meet the link:https://central.sonatype.org/publish/requirements/[requirements of the Central Publisher Portal].
+Each artifact needs a signature, a sources archive and a Javadoc archive.
+The project model needs a name, a description, a web address, the licenses, the developers and the source repository.
+Check: the Central Publisher Portal checks each upload.
+
+The link:https://central.sonatype.org/publish/publish-maven/[guide for Maven] gives the plugin to use.
+
+== Packages
+
+[[COD-114]]
+*COD-114.* An {abbr-fpsot} library MUST keep its domain and its ports apart from its adapters.
+Their packages MUST NOT import an adapter package.
+Adapters MUST depend on ports, never the reverse.
+An application module MAY use layered packages inside its adapters.
+Check: an ArchUnit test, under COD-104.
+
+A port is the plain Java interface that an adopter can replace.
+The xref:overridable-rules.adoc[Overridable rules] page shows how a Quarkus extension exposes one.
+
+== References
+
+=== Normative
+
+* link:https://openjdk.org/jeps/12[JEP 12: Preview Features], OpenJDK. link:https://web.archive.org/web/20261019172146/https://openjdk.org/jeps/12[Archived copy]
+* link:https://github.com/quarkusio/quarkus/blob/main/CONTRIBUTING.md[Contributing guide], Quarkus project, on GitHub. link:https://web.archive.org/web/20260713173313/https://github.com/quarkusio/quarkus/blob/main/CONTRIBUTING.md[Archived copy]
+* link:https://jspecify.dev/docs/user-guide/[JSpecify user guide], JSpecify, version 1.0. link:https://web.archive.org/web/20261019102606/https://jspecify.dev/docs/user-guide/[Archived copy]
+* link:https://maven.apache.org/enforcer/[Apache Maven Enforcer], Apache Software Foundation, version 3.7.0. link:https://web.archive.org/web/20260630063056/https://maven.apache.org/enforcer/[Archived copy]
+* link:https://maven.apache.org/enforcer/enforcer-rules/index.html[Built-In Rules], Apache Maven Enforcer. link:https://web.archive.org/web/20251126110101/https://maven.apache.org/enforcer/enforcer-rules/index.html[Archived copy]
+* link:https://maven.apache.org/wrapper/[Maven Wrapper], Apache Software Foundation. link:https://web.archive.org/web/20250606003008/https://maven.apache.org/wrapper/[Archived copy]
+* link:https://maven.apache.org/guides/mini/guide-reproducible-builds.html[Configuring for Reproducible Builds], Apache Maven. link:https://web.archive.org/web/20261105151800/https://maven.apache.org/guides/mini/guide-reproducible-builds.html[Archived copy]
+* link:https://central.sonatype.org/publish/requirements/[Requirements], Sonatype Central. link:https://web.archive.org/web/20261104025647/https://central.sonatype.org/publish/requirements/[Archived copy]
+
+=== Informative
+
+* link:https://quarkus.io/blog/quarkus-4-0-0-beta1-released/[Quarkus 4.0.0.Beta1 released], Quarkus blog. link:https://web.archive.org/web/20261006151919/https://quarkus.io/blog/quarkus-4-0-0-beta1-released/[Archived copy]
+* link:https://hub.quarkiverse.io/checklistfornewprojects/[Checklist for new projects], Quarkiverse. link:https://web.archive.org/web/20250207074542/https://hub.quarkiverse.io/checklistfornewprojects/[Archived copy]
+* link:https://code.revelc.net/formatter-maven-plugin/[Formatter Maven Plugin], revelc.net, version 2.29.0. link:https://web.archive.org/web/20260809181016/https://code.revelc.net/formatter-maven-plugin/[Archived copy]
+* link:https://code.revelc.net/impsort-maven-plugin/[ImpSort Maven Plugin], revelc.net, version 1.13.0. link:https://web.archive.org/web/20260809181016/https://code.revelc.net/impsort-maven-plugin/[Archived copy]
+* link:https://github.com/uber/NullAway/releases[NullAway releases], Uber, version 0.14.4, 2026-11-16. link:https://github.com/uber/NullAway/tree/5be6a1d8059c43bd61059faf6097a50b41e5ad8f/[Source at the release commit]
+* link:https://github.com/google/error-prone/releases[Error Prone releases], Google, version 2.52.0. link:https://web.archive.org/web/20260416032058/https://github.com/google/error-prone/releases[Archived copy]
+* link:https://spotbugs.github.io/[SpotBugs], SpotBugs project. link:https://web.archive.org/web/20261104195909/https://spotbugs.github.io/[Archived copy]
+* link:https://find-sec-bugs.github.io/[Find Security Bugs], version 1.14.0. link:https://web.archive.org/web/20261103042115/https://find-sec-bugs.github.io/[Archived copy]
+* link:https://www.archunit.org/[ArchUnit], TNG Technology Consulting. link:https://web.archive.org/web/20261017154535/https://www.archunit.org/[Archived copy]
+* link:https://openjdk.org/jeps/395[JEP 395: Records], OpenJDK, delivered in JDK 16. link:https://web.archive.org/web/20261114001847/https://openjdk.org/jeps/395[Archived copy]
+* link:https://openjdk.org/jeps/409[JEP 409: Sealed Classes], OpenJDK, delivered in JDK 17. link:https://web.archive.org/web/20261114005136/https://openjdk.org/jeps/409[Archived copy]
+* link:https://openjdk.org/jeps/440[JEP 440: Record Patterns], OpenJDK, delivered in JDK 21. link:https://web.archive.org/web/20260813025317/https://openjdk.org/jeps/440[Archived copy]
+* link:https://openjdk.org/jeps/441[JEP 441: Pattern Matching for switch], OpenJDK, delivered in JDK 21. link:https://web.archive.org/web/20261116032512/https://openjdk.org/jeps/441[Archived copy]
+* link:https://openjdk.org/jeps/444[JEP 444: Virtual Threads], OpenJDK, delivered in JDK 21. link:https://web.archive.org/web/20261012100907/https://openjdk.org/jeps/444[Archived copy]
+* link:https://openjdk.org/jeps/491[JEP 491: Synchronize Virtual Threads without Pinning], OpenJDK, delivered in JDK 24. link:https://web.archive.org/web/20261012101113/https://openjdk.org/jeps/491[Archived copy]
+* link:https://github.com/siom79/japicmp[japicmp], version 0.27.0. link:https://web.archive.org/web/20260812045609/https://github.com/siom79/japicmp[Archived copy]
+* link:https://central.sonatype.org/publish/publish-maven/[Publishing by Using the Maven Plugin], Sonatype Central. link:https://web.archive.org/web/20260829215648/https://central.sonatype.org/publish/publish-maven/[Archived copy]
+
+== Document history
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Change
+|0.1.0 |2026-11-18 |First version.
+|===

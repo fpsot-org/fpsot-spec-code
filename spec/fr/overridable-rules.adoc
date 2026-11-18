@@ -1,0 +1,137 @@
+= Règles substituables
+include::_fpsot-terms.adoc[]
+
+Cette page est informative.
+Elle ne fixe aucune règle.
+Elle passera à la future spécification sur les capacités, qui encadrera les substitutions.
+Ce contrat dira comment un système trouve un remplacement, et lequel l’emporte.
+
+La page montre une façon d’écrire une règle d’affaires qu’un adoptant peut remplacer dans une application Quarkus.
+Elle combine des patrons du guide sur l’écriture d’extensions et de la référence CDI de Quarkus.
+Aucun document de Quarkus ne présente cette combinaison comme un patron officiel.
+
+== Les éléments
+
+Le patron compte trois éléments.
+
+. Un module de règles contient l’interface de la règle et sa classe par défaut, en Java ordinaire.
+Il n’importe rien de `+jakarta.*+` ni de `+io.quarkus.*+`, selon COD-205.
+. Le module d’exécution de l’extension expose la classe par défaut comme un bean.
+Ce bean s’efface quand l’application en fournit un autre.
+. L’application remplace la classe par défaut en déclarant son propre bean.
+
+Le module de règles fonctionne dans tout programme Java.
+Un test peut appeler la classe par défaut sans conteneur.
+
+[source,java]
+----
+package org.fpsot.example.rules;
+
+import java.math.BigDecimal;
+
+public record Household(BigDecimal income, BigDecimal limit) {
+}
+----
+
+[source,java]
+----
+package org.fpsot.example.rules;
+
+public interface IncomeLimit {
+    boolean exceeds(Household household);
+}
+----
+
+[source,java]
+----
+package org.fpsot.example.rules;
+
+public final class DefaultIncomeLimit implements IncomeLimit {
+    @Override
+    public boolean exceeds(Household household) {
+        return household.income().compareTo(household.limit()) > 0;
+    }
+}
+----
+
+== Exposer la classe par défaut
+
+Le module d’exécution de l’extension déclare un producteur.
+L’annotation `@DefaultBean` fait s’effacer le bean quand l’application fournit un bean du même type.
+
+[source,java]
+----
+package org.fpsot.example.runtime;
+
+import io.quarkus.arc.DefaultBean;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.inject.Produces;
+import org.fpsot.example.rules.DefaultIncomeLimit;
+import org.fpsot.example.rules.IncomeLimit;
+
+@Dependent
+class IncomeLimitProducer {
+    @Produces
+    @DefaultBean
+    @ApplicationScoped
+    IncomeLimit incomeLimit() {
+        return new DefaultIncomeLimit();
+    }
+}
+----
+
+Le producteur et sa méthode ont la visibilité du paquet, selon COD-204.
+
+== Remplacer la classe par défaut
+
+Dans Quarkus, une application dispose de trois voies.
+
+* Elle déclare son propre bean du type de l’interface, et le bean par défaut s’efface.
+* Elle déclare un bean avec `@Alternative` et `@Priority`.
+Les observateurs du bean par défaut continuent alors de s’exécuter.
+* Elle choisit un bean au moment de la construction avec `@IfBuildProperty` ou `@IfBuildProfile`.
+Une propriété fixée à l’exécution n’a aucun effet sur ce choix.
+
+Le code qui a besoin de toutes les implémentations, comme une chaîne de règles, peut injecter `@All List<T>`.
+Il les reçoit par ordre de priorité.
+Le `ServiceLoader` de Java fonctionne dans une image native seulement si l’extension enregistre le service avec `ServiceProviderBuildItem`.
+
+== Vérifier la frontière
+
+Un test ArchUnit dans le module de règles prouve qu’il n’importe aucun paquet de cadriciel.
+
+[source,java]
+----
+package org.fpsot.example.rules;
+
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+
+import com.tngtech.archunit.junit.AnalyzeClasses;
+import com.tngtech.archunit.junit.ArchTest;
+import com.tngtech.archunit.lang.ArchRule;
+
+@AnalyzeClasses(packages = "org.fpsot.example.rules")
+class RuleModuleTest {
+    @ArchTest
+    static final ArchRule noFramework = noClasses()
+            .should().dependOnClassesThat()
+            .resideInAnyPackage("jakarta..", "io.quarkus..");
+}
+----
+
+== Références
+
+=== Références informatives
+
+* link:https://quarkus.io/guides/writing-extensions[Writing your own extension], Quarkus guides. link:https://web.archive.org/web/20261111141748/https://quarkus.io/guides/writing-extensions/[Copie archivée]
+* link:https://quarkus.io/guides/cdi-reference[Contexts and Dependency Injection], Quarkus guides. link:https://web.archive.org/web/20261111141800/https://quarkus.io/guides/cdi-reference/[Copie archivée]
+* link:https://www.archunit.org/[ArchUnit], TNG Technology Consulting. link:https://web.archive.org/web/20261017154535/https://www.archunit.org/[Copie archivée]
+
+== Historique du document
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Changement
+|0.1.0 |2026-11-18 |Première version.
+|===

@@ -1,0 +1,54 @@
+= Awaiting confirmation
+include::_fpsot-terms.adoc[]
+
+This page is informative.
+It sets no rule.
+It lists guidance that the project lead must confirm before it enters a language page.
+
+== Recorded resolutions on Java and Go
+
+The project lead recorded twelve resolutions of conflicts in earlier guidance on Java and Go.
+They prefer rules for one version and one measured case over blanket rules.
+
+Once the lead confirms one, it becomes a SHOULD in the review guidance of the Java or Go page.
+Until then, none of them binds a project.
+They cover these topics.
+
+[cols="1,4",options="header"]
+|===
+|Numbers |Topics
+|1 to 7 |Java concurrency: the choice between read-write locks and other locks, pinning of virtual threads by JDK version, pooling and throttling, the size of thread pools, executors for asynchronous fan-out, lazy initialization and the default kind of lock.
+|8 |Java errors: when an exception should be checked.
+|9 and 10 |Go errors: sentinel values against custom types, and wrapping with `%w` against `%v`.
+|11 and 12 |Go functions: named results, and value against pointer receivers.
+|===
+
+Three rules of this specification touch the same topics.
+COD-112 forbids pooling virtual threads, after JEP 444.
+COD-405 makes a MUST only of what `go vet` and `errorlint` check.
+It keeps the choice between `%w` and `%v` as a SHOULD.
+COD-105 makes Java exceptions unchecked.
+It follows the model of errors that the lead approved for Java and Kotlin together.
+
+Five more resolutions concern Rust and C.
+{abbr-fpsot-first} does not use those languages, so this specification leaves them out.
+
+== Facts to verify
+
+These facts could change a rule, and the research could not check them at a primary source.
+
+* Whether Quarkus 4.0 will have long-term support, under COD-200.
+* The line length of the Quarkus formatter settings, under COD-102.
+* Whether a native image comes out the same across runs and settings of `--parallelism`, under COD-022.
+* The license terms of Liquibase 5, under COD-701.
+* When GitHub makes lockfiles of workflows generally available, and on which plans.
+* Whether SecretManagement for PowerShell has a successor, under COD-558.
+* Whether Kotlin reports JSpecify problems as errors or warnings by default, under COD-103.
+
+== Document history
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Change
+|0.1.0 |2026-11-18 |First version.
+|===

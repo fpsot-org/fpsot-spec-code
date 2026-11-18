@@ -26,6 +26,22 @@ jobs:
     with:
       prefix: ${{ needs.prefix.outputs.value }}
       doc-rules: true
+  examples:
+    # Checks that each example configuration file in examples/ parses and holds the
+    # settings that its rules ask for, then checks that the check rejects broken copies.
+    # Python standard library only, no network.
+    # A required check of the main branch once the ruleset lists it.
+    if: github.ref_type != 'tag'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.14'
+      - run: bash examples/test-examples.sh
   diagrams:
     if: github.ref_type != 'tag'
     uses: fpsot-org/GitHub-Actions/.github/workflows/diagrams.yml@v0

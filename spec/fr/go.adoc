@@ -1,0 +1,127 @@
+= Go
+include::_fpsot-terms.adoc[]
+
+Cette page couvre le code Go.
+La {abbr-fpsot-first} écrit ses outils en Go, comme les vérificateurs pour l’{abbr-ci-first} et les programmes en ligne de commande.
+
+[cols="1,3"]
+|===
+|Rôle responsable |Responsable Go du groupe de travail
+|Dernière révision |2026-11-18
+|Réviser au plus tard le |2027-05-18
+|===
+
+== Outils de l’édition 2026
+
+[cols="2,1,3",options="header"]
+|===
+|Outil |Version |Rôle
+|Go |1.27.x pour construire, 1.26 dans la ligne `go` |Compile et teste le code.
+|golangci-lint |2.15.0 |Met le code en forme et exécute les analyseurs.
+|govulncheck |1.10.0 |Repère les faiblesses connues que le code atteint.
+|go test |la version de la chaîne d’outils |Exécute les tests.
+|===
+
+== Règles
+
+[[COD-400]]
+*COD-400.* Un projet DOIT se construire avec la dernière version de la plus récente ligne de versions Go soutenue.
+La ligne `go` de `go.mod` DOIT nommer la ligne de versions soutenue précédente.
+Les deux lignes de versions soutenues peuvent ainsi construire le code.
+Un projet DOIT passer à une nouvelle version majeure dans les 6 mois de sa sortie.
+Vérification : revue de `go.mod` et des tâches d’{abbr-ci}.
+
+La link:https://go.dev/doc/devel/release[politique de versions de Go] soutient chaque version majeure jusqu’à la sortie de deux versions plus récentes.
+Pour cette édition, les lignes de versions soutenues sont 1.27 et 1.26.
+
+[[COD-401]]
+*COD-401.* Le code Go DOIT réussir `golangci-lint fmt` et `golangci-lint run`.
+Il DOIT employer une configuration archivée au format de la version 2.
+La configuration DOIT garder l’ensemble `standard` d’analyseurs.
+Elle DOIT ajouter `nolintlint`, `gosec`, `errorlint`, `revive`, `bodyclose` et `contextcheck`.
+Les outils de mise en forme DOIVENT comprendre `gofmt` et `goimports`.
+Vérification : golangci-lint dans l’{abbr-ci}.
+
+Le link:https://golangci-lint.run/docs/configuration/file/[fichier de configuration de golangci-lint] commence par `version: "2"`.
+La version 2 a déplacé la mise en forme dans sa propre commande.
+Les configurations de la version 1 ne se chargent plus.
+Le fichier `examples/.golangci.yml` montre une configuration conforme.
+Les link:https://go.dev/wiki/CodeReviewComments[Go Code Review Comments] et le link:https://google.github.io/styleguide/go/index[Google Go Style Guide] couvrent ce que les analyseurs ne peuvent pas vérifier.
+
+[[COD-402]]
+*COD-402.* L’{abbr-ci} DOIT exécuter `go vet ./...`, `go test -race ./...` et `govulncheck ./...`.
+Vérification : ces commandes dans l’{abbr-ci}.
+
+L’outil link:https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck[govulncheck] ne signale que les faiblesses que le code peut atteindre.
+C’est le mécanisme Go pour SEC-014.
+TST-006 laisse le choix de l’outil de test, et les projets Go emploient `go test`.
+
+[[COD-403]]
+*COD-403.* L’{abbr-ci} DOIT fixer `GOTOOLCHAIN` à une version exacte.
+Après `go mod tidy`, l’{abbr-ci} DOIT ne signaler aucun changement dans `go.mod` ou `go.sum`.
+La commande `go mod verify` DOIT réussir, et le {term-repository} DOIT archiver `go.sum`.
+Vérification : ces commandes dans l’{abbr-ci}.
+
+Le link:https://go.dev/doc/toolchain[guide des chaînes d’outils de Go] explique la ligne `toolchain` et `GOTOOLCHAIN`.
+La base de sommes de contrôle vérifie chaque chaîne d’outils téléchargée.
+Go 1.27 a modifié un peu l’alignement dans `gofmt`.
+L’{abbr-ci} et les développeurs ont donc besoin de la même chaîne d’outils.
+
+[[COD-404]]
+*COD-404.* Un binaire publié DOIT se construire avec `CGO_ENABLED=0` et `-trimpath`.
+Le flux de travail de publication DOIT le construire deux fois et comparer les résultats, selon COD-022.
+Vérification : le flux de travail de publication.
+
+Le link:https://go.dev/blog/rebuild[blogue de Go sur les constructions parfaitement reproductibles] donne cette commande pour les versions publiées.
+
+[[COD-405]]
+*COD-405.* Le code DOIT comparer les erreurs avec `errors.Is`, `errors.As` ou `errors.AsType`, jamais avec `==` sur une erreur enveloppée.
+Il NE DOIT PAS envelopper avec `%w` un pointeur vers un type d’erreur aux méthodes à récepteur par valeur.
+Il DEVRAIT envelopper avec `%w` seulement quand l’appelant peut examiner la cause, et employer `%v` sinon.
+Vérification : l’analyseur `errorlint` et `go vet` pour les obligations, et la revue pour la recommandation.
+
+La version link:https://go.dev/doc/go1.26[Go 1.26] a ajouté `errors.AsType`.
+Dans link:https://go.dev/doc/go1.27[Go 1.27], `go vet` signale un `%w` qui enveloppe un tel pointeur, car `errors.Is` échoue alors souvent.
+
+[[COD-406]]
+*COD-406.* Un service DEVRAIT journaliser avec `log/slog` et son gestionnaire {abbr-json-first}, sous la forme d’OBS-080.
+Un analyseur syntaxique d’entrées externes DEVRAIT avoir un test à données aléatoires, avec son corpus sous `testdata/fuzz`.
+Vérification : revue.
+
+Le link:https://pkg.go.dev/log/slog[paquet slog] écrit des enregistrements structurés.
+Le link:https://go.dev/doc/security/fuzz/[guide de Go sur les tests à données aléatoires] décrit le corpus.
+
+[[COD-407]]
+*COD-407.* Un programme en ligne de commande DEVRAIT sortir avec le code 0 en cas de succès.
+Il DEVRAIT sortir avec 1 en cas d’échec et 2 en cas de mauvais usage.
+Il DEVRAIT écrire ses erreurs dans le flux d’erreur standard.
+Il DEVRAIT offrir `--help` et `--version`.
+La version DEVRAIT provenir des données de construction que Go intègre au binaire.
+Vérification : revue.
+
+== Références
+
+=== Références normatives
+
+* link:https://go.dev/doc/devel/release[Release History], site de Go. link:https://web.archive.org/web/20261116083749/https://go.dev/doc/devel/release[Copie archivée]
+* link:https://golangci-lint.run/docs/configuration/file/[Configuration File], golangci-lint, version 2. link:https://web.archive.org/web/20261105024057/https://golangci-lint.run/docs/configuration/file/[Copie archivée]
+* link:https://go.dev/doc/toolchain[Go Toolchains], site de Go. link:https://web.archive.org/web/20261021034706/https://go.dev/doc/toolchain[Copie archivée]
+* link:https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck[govulncheck], gestion des vulnérabilités de Go. link:https://web.archive.org/web/20261116105958/https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck[Copie archivée]
+
+=== Références informatives
+
+* link:https://go.dev/wiki/CodeReviewComments[Go Code Review Comments], wiki de Go. link:https://web.archive.org/web/20261108091218/https://go.dev/wiki/CodeReviewComments[Copie archivée]
+* link:https://google.github.io/styleguide/go/index[Go Style], Google. link:https://web.archive.org/web/20261016184647/https://google.github.io/styleguide/go/index[Copie archivée]
+* link:https://go.dev/blog/rebuild[Perfectly Reproducible, Verified Go Toolchains], blogue de Go. link:https://web.archive.org/web/20261107235604/https://go.dev/blog/rebuild[Copie archivée]
+* link:https://go.dev/doc/go1.26[Go 1.26 Release Notes], site de Go. link:https://web.archive.org/web/20261116041539/https://go.dev/doc/go1.26[Copie archivée]
+* link:https://go.dev/doc/go1.27[Go 1.27 Release Notes], site de Go. link:https://web.archive.org/web/20261116122552/https://go.dev/doc/go1.27[Copie archivée]
+* link:https://pkg.go.dev/log/slog[Package slog], bibliothèque standard de Go. link:https://web.archive.org/web/20261104134213/https://pkg.go.dev/log/slog[Copie archivée]
+* link:https://go.dev/doc/security/fuzz/[Go Fuzzing], site de Go. link:https://web.archive.org/web/20261111063416/https://go.dev/doc/security/fuzz/[Copie archivée]
+
+== Historique du document
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Changement
+|0.1.0 |2026-11-18 |Première version.
+|===

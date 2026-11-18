@@ -1,8 +1,105 @@
 = FPSOT code specification
 include::_fpsot-terms.adoc[]
 
-Replace this page with the normative text of the specification.
-Start with the scope, then the conformance classes, then the requirements.
+This specification sets how the projects of {abbr-fpsot-first} write their software, and how they format, check and build it.
+It covers the languages and file types that {abbr-fpsot} projects use, from Java and Go to container files and workflows.
+A pinned formatter and a pinned linter decide each question that a tool can settle.
+Prose rules cover only what tools cannot check.
+
+The rules come in a common page and one page per language.
+Each language page is short, names its tools and their versions, and has an owner and a review date.
+Tool versions move every month, so each page carries the date of its last review.
+
+== Scope
+
+[[COD-001]]
+*COD-001.* These rules apply to each software {term-repository} of {abbr-fpsot}, and of each project that adopts this specification.
+They cover the source code and the build files.
+They also cover scripts and templates, container files and workflows, and the configuration files.
+The prose of a specification follows the {abbr-fpsot} writing specification instead.
+Check: review of the scope of each conformance claim.
+
+The rules set how code looks, which tools check it and how it builds.
+They do not set what the software does.
+Other {abbr-fpsot} specifications set its behavior, such as its interfaces, its logs and its tests.
+
+== How tools decide
+
+[[COD-002]]
+*COD-002.* Each language in a {term-repository} MUST have one named formatter and one named set of linters.
+The {term-repository} MUST pin each of them to an exact version and commit its configuration.
+The {abbr-ci-first} MUST fail when the formatter would change a file, or when a linter reports an error.
+Check: the {abbr-ci} job of each language.
+
+The link:https://github.com/coreinfrastructure/best-practices-badge/blob/main/docs/other.md[silver level of the OpenSSF Best Practices badge] asks for the same thing.
+A project names a style guide for each main language, and a free tool enforces it where one exists.
+The link:https://github.com/alphagov/gds-way/blob/278012d99be4e916c2795a71fa068f37f15d0d28/source/manuals/programming-languages.html.md.erb[GDS Way] of the UK government follows the same pattern.
+
+[[COD-003]]
+*COD-003.* A rule that a tool can check MUST run as that tool in {abbr-ci}.
+Each rule of this specification ends with a line that names its check.
+A rule marked _review_ has no reliable tool.
+The reviewer of each pull request checks it.
+Check: review of each change to this specification.
+
+The link:https://github.com/ANSSI-FR/rust-guide/blob/3f9e2e28095d0eeb35ed61e212a82be12fde4884/src/en/devenv.md[Rust guide of the French cybersecurity agency] uses the same split.
+Its use of a linter is a rule, and its check of each automatic fix is a rule too.
+
+== Conformance of a repository
+
+[[COD-004]]
+*COD-004.* A {term-repository} conforms when it meets each MUST of this page and of the xref:common.adoc[common page].
+It MUST also meet each MUST of the page of each language that it holds.
+Generated files and copies of outside code follow COD-011 instead of their language page.
+Check: review.
+
+[[COD-005]]
+*COD-005.* Each language page MUST name its owner role, the date of its last review and a review-by date.
+The review-by date MUST fall no more than 12 months after the last review.
+By that date, the owner MUST check the versions and the tools of the page.
+The owner then releases the result.
+Check: review at each release of this specification.
+
+The owner role is the lead of that language in the Working Group.
+Until the Working Group names a lead, the Maintainer holds the role.
+A page past its review-by date stays in force, but its version tables may be out of date.
+
+== Pages
+
+* xref:common.adoc[Common rules] apply to every language.
+* xref:java.adoc[Java], xref:quarkus.adoc[Quarkus] and xref:kotlin.adoc[Kotlin] cover the code that runs on the Java platform.
+* xref:go.adoc[Go] covers tools, checkers and command-line programs.
+* xref:bash.adoc[Bash] and xref:powershell.adoc[PowerShell] cover scripts.
+* xref:javascript.adoc[JavaScript and TypeScript] and xref:html-css.adoc[HTML and CSS] cover what runs in the browser.
+* xref:sql.adoc[SQL] covers queries and database migrations.
+* xref:containers.adoc[Container files], xref:workflows.adoc[CI workflows] and xref:config.adoc[Configuration files] cover what builds, ships and configures software.
+* xref:python.adoc[Python] covers tooling scripts.
+
+Three informative pages follow the rules.
+
+* xref:style-editions.adoc[Style editions] lists the tool versions of each edition and explains how to move to a new one.
+* xref:overridable-rules.adoc[Overridable rules] describes a Quarkus pattern for business rules that an adopter can replace.
+It moves to the future capability specification once that specification exists.
+* xref:to-be-confirmed.adoc[Awaiting confirmation] lists guidance that waits for the project lead to decide.
+
+== Layering and related specifications
+
+This is a layer 1 specification.
+It cites the rules of other {abbr-fpsot} specifications by number and restates none of them.
+
+* The security specification owns the static analysis and the scans of secrets and dependencies, under SEC-012 to SEC-016.
+It also owns secrets, under SEC-020 and SEC-024, and the supply chain, under SEC-030 to SEC-037.
+This specification gives the mechanism of each tool and cites those rules for the outcome.
+* The version control specification owns signed commits, commit messages and release tags, under VCS-001 to VCS-003 and VCS-106.
+* The testing specification owns the test levels and the scenarios, and the tests of the built artifact.
+It sets them under TST-014, TST-020 and TST-065.
+* The naming specification owns each name that leaves the code, such as packages, fields and paths, under NAM-001 to NAM-023.
+* The observability specification owns the form of log records, under OBS-020 and OBS-080.
+* The accessibility and style specifications own the rules of pages and themes, under ACC-001 and STY-001.
+* The decisions specification owns the Java binding of a decision, under DEC-021.
+
+A future capability specification will own how an adopter replaces a part, and which part wins.
+A future legal specification will own the allowed licenses and copyright notices.
 
 == Conformance
 
@@ -11,35 +108,26 @@ ____
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 (link:https://www.rfc-editor.org/info/rfc2119[RFC 2119], link:https://www.rfc-editor.org/info/rfc8174[RFC 8174]) when, and only when, they appear in all capitals, as shown here.
 ____
 
-The keywords follow requirement WRT-010 of the {abbr-fpsot-first} writing specification.
+The keywords follow requirement WRT-010 of the {abbr-fpsot} writing specification.
 The French version uses the French keywords of WRT-011.
 
-== Requirements
-
-Give each requirement an anchor line with its ID, directly above its paragraph.
-The anchor looks like `+[[XYZ-001]]+`.
-The example below shows the form. Replace it with the first requirement.
-
-[[TPL-001]]
-*TPL-001.* A normative statement MUST use one of the {abbr-bcp-first} 14 keywords in capitals.
-The keyword gives the rule its strength.
-
 == References
-
-List here each outside source that this page cites, with the same address as its link in the text.
-Each entry gives the title, publisher, version, date and an archived copy.
 
 === Normative
 
 * link:https://www.rfc-editor.org/info/rfc2119[RFC 2119, Key words for use in RFCs to Indicate Requirement Levels], IETF, BCP 14, 1997-03. link:https://web.archive.org/web/20261103005705/https://www.rfc-editor.org/info/rfc2119/[Archived copy]
 * link:https://www.rfc-editor.org/info/rfc8174[RFC 8174, Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words], IETF, BCP 14, 2017-05. link:https://web.archive.org/web/20261103005743/https://www.rfc-editor.org/info/rfc8174/[Archived copy]
 
-== Document history
+=== Informative
 
-Add one row for each version that changes this page.
+* link:https://github.com/coreinfrastructure/best-practices-badge/blob/main/docs/other.md[OpenSSF Best Practices Badge, silver and gold criteria], Open Source Security Foundation, on GitHub. link:https://web.archive.org/web/20260227104005/https://github.com/coreinfrastructure/best-practices-badge/blob/main/docs/other.md[Archived copy]
+* link:https://github.com/alphagov/gds-way/blob/278012d99be4e916c2795a71fa068f37f15d0d28/source/manuals/programming-languages.html.md.erb[The GDS Way, Programming languages], Government Digital Service, source at commit 278012d.
+* link:https://github.com/ANSSI-FR/rust-guide/blob/3f9e2e28095d0eeb35ed61e212a82be12fde4884/src/en/devenv.md[Secure Rust Guidelines, Development environment], ANSSI, source at commit 3f9e2e2.
+
+== Document history
 
 [cols="1,1,4",options="header"]
 |===
 |Version |Date |Change
-|0.1.0 |2026-11-03 |First version.
+|0.1.0 |2026-11-18 |First version.
 |===

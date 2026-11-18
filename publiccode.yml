@@ -9,22 +9,48 @@ developmentStatus: concept
 softwareType: "standalone/other"
 description:
   en:
-    shortDescription: Template for FPSOT specification repositories.
+    shortDescription: Rules for how public sector open source projects write, format, check and build their code, language by language.
     longDescription: >
-      Starting point for an FPSOT specification repository. It holds the
-      layout, the Community Specification License files, and the CI that
-      checks requirement IDs, links, languages and prose.
+      Rules for how FPSOT projects write, format, check and build their
+      software. A pinned formatter and linter set decides each question that a
+      tool can settle, and prose rules cover only the rest; each rule names its
+      check. A common page sets suppressions, license headers, EditorConfig,
+      declared toolchains, style editions, release files and reproducible
+      builds. Thirteen short language pages, each with an owner and a review
+      date, cover Java, Quarkus, Kotlin, Go, Bash, PowerShell, JavaScript and
+      TypeScript, HTML and CSS, SQL, container files, CI workflows,
+      configuration files and Python tooling.
     features:
-      - Specification repository layout
+      - One pinned formatter and linter set per language, enforced in CI
+      - Each rule names its tool, or review
+      - Style editions so that tool upgrades never break CI by surprise
+      - Java 21 bytecode built on Java 25, with JSpecify and NullAway
+      - Quarkus extension and native image rules
+      - Supply chain mechanisms for Maven, Go, npm, containers and GitHub Actions
+      - Example configuration files checked in CI
   fr:
-    shortDescription: Gabarit des dépôts de spécification de FPSOT.
+    shortDescription: Règles sur la façon dont les projets libres du secteur public écrivent, mettent en forme, vérifient et construisent leur code, langage par langage.
     longDescription: >
-      Point de départ d'un dépôt de spécification de FPSOT. Il contient la
-      structure, les fichiers de la Community Specification License, et
-      l'intégration continue qui vérifie les identifiants, les liens, les
-      langues et la rédaction.
+      Règles sur la façon dont les projets de la FPSOT écrivent, mettent en
+      forme, vérifient et construisent leurs logiciels. Un outil de mise en
+      forme et des analyseurs statiques épinglés tranchent chaque question
+      qu’un outil peut régler, et les règles rédigées couvrent seulement le
+      reste; chaque règle nomme sa vérification. Une page commune encadre la
+      désactivation des constats, les en-têtes de licence, EditorConfig, les
+      chaînes d’outils déclarées, les éditions de style, les fichiers de
+      publication et les constructions reproductibles. Treize courtes pages
+      de langage, chacune avec un rôle responsable et une date de révision,
+      couvrent Java, Quarkus, Kotlin, Go, Bash, PowerShell, JavaScript et
+      TypeScript, HTML et CSS, SQL, les fichiers de conteneur, les flux de
+      travail d’IC, les fichiers de configuration et les outils en Python.
     features:
-      - Structure d'un dépôt de spécification
+      - Un outil de mise en forme et des analyseurs statiques épinglés par langage, appliqués dans l’IC
+      - Chaque règle nomme son outil, ou la revue
+      - Des éditions de style pour que les mises à jour d’outils ne brisent jamais l’IC par surprise
+      - Bytecode Java 21 construit sur Java 25, avec JSpecify et NullAway
+      - Règles sur les extensions Quarkus et les images natives
+      - Mécanismes de chaîne d’approvisionnement pour Maven, Go, npm, les conteneurs et GitHub Actions
+      - Fichiers de configuration d’exemple vérifiés dans l’IC
 legal:
   license: Community-Spec-1.0
 maintenance:

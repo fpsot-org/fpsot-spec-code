@@ -1,0 +1,128 @@
+= JavaScript and TypeScript
+include::_fpsot-terms.adoc[]
+
+This page covers JavaScript and TypeScript, in the browser and in Node.js tools.
+The front end of {abbr-fpsot-first} renders {abbr-html-first} on the server, so scripts add to pages that already work.
+
+[cols="1,3"]
+|===
+|Owner role |Web lead of the Working Group
+|Last reviewed |2026-11-18
+|Review by |2027-05-18
+|===
+
+The review comes after six months because TypeScript and its linter are between two major versions.
+
+== Tools of edition 2026
+
+[cols="2,1,3",options="header"]
+|===
+|Tool |Version |Role
+|Node.js |26 long-term support |Runs tools and builds.
+|TypeScript |6.0.x |Checks types and feeds the linter.
+|TypeScript |7.0 |MAY compile, next to 6.0.
+|ESLint |10.15.0 |Lints code, with the flat configuration only.
+|typescript-eslint |8.73.0 |Adds rules that read types.
+|Prettier |3.10.1 |Formats code.
+|Vitest, or `node:test` |5.1.1, or the version of Node.js |Runs tests.
+|===
+
+== Rules
+
+[[COD-600]]
+*COD-600.* New work MUST run on Node.js 26.
+A project MUST run only on a line of Node.js in active or maintenance long-term support.
+It MUST declare the line in the `engines` field of `package.json` and in a `.node-version` file.
+Check: `npm ci` with `engine-strict=true`, which fails on a wrong engine, and review of the {abbr-ci-first} jobs.
+
+The link:https://nodejs.org/en/about/previous-releases[Node.js releases page] lists each line and its end date.
+From Node.js 27, link:https://nodejs.org/en/blog/announcements/evolving-the-nodejs-release-schedule[one major release a year] ships, and each one becomes a long-term release.
+
+[[COD-601]]
+*COD-601.* A project MUST check types and lint with TypeScript 6.0.x while typescript-eslint does not support TypeScript 7.
+It MAY also compile with TypeScript 7.
+Check: the version of `typescript` in the lock file, and review.
+
+link:https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/[TypeScript 7.0] is a native port that shipped without an interface for other tools.
+The link:https://typescript-eslint.io/users/dependency-versions/[supported versions of typescript-eslint] stop below TypeScript 6.1.
+Rules that read types matter more than the speed of the compiler, so the linter decides.
+The owner revisits this rule when typescript-eslint supports TypeScript 7.
+
+[[COD-602]]
+*COD-602.* The `tsconfig.json` file MUST turn on `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noImplicitOverride` and `verbatimModuleSyntax`.
+Code MUST use ECMAScript modules only.
+Check: the compiler, and review of `tsconfig.json`.
+
+The link:https://www.typescriptlang.org/tsconfig/[TSConfig reference] describes each option.
+Code that Node.js runs without a build step also needs `erasableSyntaxOnly`.
+
+[[COD-603]]
+*COD-603.* ESLint MUST lint the code with a flat configuration and the `strictTypeChecked` set of typescript-eslint.
+The ESLint comments plugin MUST turn on its rule `require-description`, under COD-010.
+Prettier MUST format the code.
+Check: `eslint` and `prettier --check` in {abbr-ci}.
+
+link:https://eslint.org/docs/latest/use/migrate-to-10.0.0[ESLint 10] no longer reads the older configuration format.
+The link:https://typescript-eslint.io/users/configs/[shared configurations of typescript-eslint] include `strictTypeChecked`.
+link:https://prettier.io/[Prettier] owns the layout.
+The file `examples/eslint.config.mjs` shows a conforming configuration.
+
+[[COD-604]]
+*COD-604.* A project MUST commit its lock file and install with `npm ci`.
+Its `.npmrc` file MUST set `ignore-scripts=true`, `allow-git=none` and `engine-strict=true`.
+It MUST also set `min-release-age` to at least 3 days.
+Check: review of `.npmrc` and of the {abbr-ci} jobs.
+
+These link:https://docs.npmjs.com/cli/v11/using-npm/config[npm settings] are the npm mechanism for SEC-030 and SEC-032.
+TST-006 leaves the test runner open, and this page names Vitest or the `node:test` module of Node.js.
+A waiting period gives the registry time to remove a malicious release before a project installs it.
+
+[[COD-605]]
+*COD-605.* A project that publishes a package to npm MUST publish it through trusted publishing, with provenance.
+Check: the release workflow.
+
+link:https://docs.npmjs.com/trusted-publishers/[Trusted publishing] uses a short-lived identity from {abbr-ci} instead of a stored token, and adds provenance on its own.
+It serves SEC-024 and SEC-035.
+
+[[COD-606]]
+*COD-606.* A front end MUST render its pages as {abbr-html} on the server, and add scripts as progressive enhancement.
+A project that needs a single-page application framework MUST first record that decision, with its reasons.
+Check: review.
+
+The link:https://www.gov.uk/service-manual/technology/using-progressive-enhancement[GOV.UK Service Manual] explains why pages should work before scripts load.
+The default stack of {abbr-fpsot} is Qute templates with PatternFly, HTMX and Alpine.js.
+
+[[COD-607]]
+*COD-607.* Code MUST keep keyed data from outside in a `Map` or a `Set`.
+It MUST NOT use a plain object as a dictionary for such data.
+It MUST NOT copy keys from outside into a plain object without an allow-list.
+Check: review.
+
+This rule follows requirement 15.3.6 of the {abbr-owasp-first} {abbr-asvs-first}, which asks code to prevent prototype pollution.
+
+== References
+
+=== Normative
+
+* link:https://nodejs.org/en/about/previous-releases[Node.js Releases], OpenJS Foundation. link:https://web.archive.org/web/20261117015043/https://nodejs.org/en/about/previous-releases[Archived copy]
+* link:https://typescript-eslint.io/users/dependency-versions/[Dependency Versions], typescript-eslint, version 8.73.0. link:https://web.archive.org/web/20261115211741/https://typescript-eslint.io/users/dependency-versions/[Archived copy]
+* link:https://www.typescriptlang.org/tsconfig/[TSConfig Reference], TypeScript, Microsoft. link:https://web.archive.org/web/20261113214208/https://www.typescriptlang.org/tsconfig/[Archived copy]
+* link:https://typescript-eslint.io/users/configs/[Shared Configs], typescript-eslint. link:https://web.archive.org/web/20261104060718/https://typescript-eslint.io/users/configs/[Archived copy]
+* link:https://docs.npmjs.com/cli/v11/using-npm/config[config], npm Docs, npm 11. link:https://web.archive.org/web/20261113114320/https://docs.npmjs.com/cli/v11/using-npm/config/[Archived copy]
+* link:https://docs.npmjs.com/trusted-publishers/[Trusted publishing for npm packages], npm Docs. link:https://web.archive.org/web/20261106080202/https://docs.npmjs.com/trusted-publishers/[Archived copy]
+
+=== Informative
+
+* link:https://nodejs.org/en/blog/announcements/evolving-the-nodejs-release-schedule[Evolving the Node.js release schedule], Node.js blog. link:https://web.archive.org/web/20261114211421/https://nodejs.org/en/blog/announcements/evolving-the-nodejs-release-schedule[Archived copy]
+* link:https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/[Announcing TypeScript 7.0], Microsoft, 2026-07-08. link:https://web.archive.org/web/20261111145226/https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/[Archived copy]
+* link:https://eslint.org/docs/latest/use/migrate-to-10.0.0[Migrate to v10.x], ESLint. link:https://web.archive.org/web/20261102225934/https://eslint.org/docs/latest/use/migrate-to-10.0.0[Archived copy]
+* link:https://prettier.io/[Prettier], version 3.10.1. link:https://web.archive.org/web/20261113011542/https://prettier.io/[Archived copy]
+* link:https://www.gov.uk/service-manual/technology/using-progressive-enhancement[Building a resilient frontend using progressive enhancement], GOV.UK Service Manual. link:https://web.archive.org/web/20261101062636/https://www.gov.uk/service-manual/technology/using-progressive-enhancement[Archived copy]
+
+== Document history
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Change
+|0.1.0 |2026-11-18 |First version.
+|===

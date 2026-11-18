@@ -1,15 +1,75 @@
-= Guide
-:page-type: explanation
+= Soumettre un dépôt à la spécification sur le code
+:page-type: how-to
 include::_fpsot-terms.adoc[]
 
-Cette page explique la spécification aux personnes qui l’adoptent.
-Chaque page de guide a un seul type.
-C’est un tutoriel, un guide pratique, une référence ou une explication.
+Ce guide mène un {term-repository} de logiciel jusqu’à sa conformité à la spécification sur le code.
+Chaque étape cite la règle qu’elle respecte.
+Les fichiers de `examples/` donnent un point de départ pour chaque outil.
+
+== Dresser la liste des langages
+
+Dressez la liste des langages et des types de fichiers que contient le {term-repository}, selon COD-004.
+Comptez aussi les fichiers de construction et les scripts.
+Les gabarits, les fichiers de conteneur, les flux de travail et les fichiers de configuration comptent aussi.
+Chaque élément de la liste apporte sa propre page de la spécification.
+
+== Ajouter les fichiers communs
+
+Copiez `examples/.editorconfig` à la racine, et adaptez les sections à vos langages, selon COD-015.
+Ajoutez une ligne `SPDX-License-Identifier` au début de chaque fichier source, selon COD-014.
+Indiquez l’édition de style dans `CONTRIBUTING.md`, selon COD-019.
+Pour la version 0.1 de la spécification, l’édition est 2026.
+
+== Épingler les outils
+
+Pour chaque langage, épinglez l’outil de mise en forme et les analyseurs statiques que nomme sa page.
+Archivez aussi leurs paramètres, selon COD-002.
+
+* Java et Quarkus : ajoutez les règles de `examples/maven-enforcer.xml`, selon COD-108.
+Ajoutez aussi les plugiciels de mise en forme et de tri des importations, selon COD-102.
+* Go : copiez `examples/.golangci.yml`, selon COD-401.
+* JavaScript et TypeScript : copiez `examples/eslint.config.mjs`, selon COD-603.
+* PowerShell : copiez `examples/PSScriptAnalyzerSettings.psd1`, selon COD-551.
+* Fichiers de conteneur : copiez `examples/.hadolint.yaml`, selon COD-750.
+* YAML : copiez `examples/.yamllint.yaml`, selon COD-850.
+
+Déclarez la version de chaque chaîne d’outils dans le fichier que nomme sa page, selon COD-016.
+
+== Exécuter les vérifications dans l’intégration continue
+
+Ajoutez une tâche par langage, selon COD-002.
+Elle exécute l’outil de mise en forme en mode vérification, puis les analyseurs statiques.
+Faites de chaque tâche une vérification obligatoire des branches protégées.
+Copiez `examples/workflow-lint.yml` et `examples/zizmor.yml` pour vérifier les flux de travail eux-mêmes, selon COD-803.
+
+La première exécution trouve souvent de nombreux problèmes.
+Remettez le code en forme dans un seul {term-commit} qui ne fait rien d’autre, selon COD-019.
+Corrigez les constats des analyseurs dans les archivages suivants.
+Un constat que vous devez garder exige un commentaire qui nomme la règle et donne la raison, selon COD-010.
+
+== Préparer la publication
+
+Nommez les fichiers de publication comme le demande COD-021.
+Les outils trouvent alors la nomenclature logicielle, la provenance et la signature.
+Rendez reproductible la construction des archives Java et des binaires Go, selon COD-022, COD-109 et COD-404.
+
+== Vérifier les fichiers d’exemple
+
+Exécutez la vérification des fichiers d’exemple après avoir modifié l’un d’eux.
+
+[source,text]
+----
+bash examples/test-examples.sh
+----
+
+La vérification demande Python 3.11 ou une version ultérieure, et aucun autre paquet.
+Elle montre que chaque exemple s’analyse et contient les paramètres que ses règles demandent.
+Elle n’exécute pas les outils eux-mêmes.
 
 == Historique du document
 
 [cols="1,1,4",options="header"]
 |===
 |Version |Date |Changement
-|0.1.0 |2026-11-03 |Première version.
+|0.1.0 |2026-11-18 |Première version.
 |===

@@ -1,0 +1,102 @@
+= CI workflows
+include::_fpsot-terms.adoc[]
+
+This page covers the workflows of GitHub Actions.
+A workflow runs with the rights of the {term-repository}, so its mistakes become security flaws.
+
+[cols="1,3"]
+|===
+|Owner role |Platform lead of the Working Group
+|Last reviewed |2026-11-18
+|Review by |2027-05-18
+|===
+
+== Tools of edition 2026
+
+[cols="2,1,3",options="header"]
+|===
+|Tool |Version |Role
+|actionlint |1.7.12 |Checks the syntax and expressions of workflows.
+|zizmor |1.32.0 |Audits workflows for security flaws.
+|===
+
+== Rules
+
+[[COD-800]]
+*COD-800.* Each workflow MUST set `permissions` at its top level to `{}` or to `contents: read`.
+A job that needs more MUST raise its own permissions only.
+Check: the `excessive-permissions` audit of zizmor.
+
+The link:https://docs.github.com/en/actions/reference/security/secure-use[GitHub guide on secure use] asks for the least permissions for the token of each job.
+This rule is how a workflow meets SEC-024.
+
+[[COD-801]]
+*COD-801.* Each checkout MUST set `persist-credentials: false`.
+A `run` step MUST NOT expand an expression that an outside person controls, such as `${{ github.event.issue.title }}`.
+It MUST pass such a value through an environment variable instead.
+Check: the `artipacked` and `template-injection` audits of zizmor.
+
+[[COD-802]]
+*COD-802.* A workflow triggered by `pull_request_target` or `workflow_run` MUST NOT check out or run the code of a pull request.
+Check: the `dangerous-triggers` audit of zizmor, and review.
+
+[[COD-803]]
+*COD-803.* actionlint and zizmor MUST run on each pull request that changes a workflow, as required checks.
+The configuration of zizmor MUST ask for a hash pin on each outside action, under SEC-031.
+Check: the required checks of the protected branches.
+
+link:https://github.com/rhysd/actionlint[actionlint] checks syntax and runs ShellCheck on `run` steps.
+The link:https://docs.zizmor.sh/audits/[audits of zizmor] cover unpinned actions and broad permissions.
+They also cover dangerous triggers and template injection.
+The files `examples/zizmor.yml` and `examples/workflow-lint.yml` show a setup.
+
+[[COD-804]]
+*COD-804.* A project MUST build its release artifacts in a reusable workflow.
+That workflow MUST attest where each artifact and its software bill of materials come from.
+A project SHOULD call the shared release workflow of {abbr-fpsot-first}, once the `fpsot-org/GitHub-Actions` repository offers one for code.
+Check: review of the release workflow.
+
+That repository already releases specifications through its reusable workflow `spec-release.yml`, the pattern that a release workflow for code follows.
+
+link:https://docs.github.com/en/actions/concepts/security/artifact-attestations[GitHub artifact attestations] give Build Level 2 of SLSA, which SEC-035 asks for.
+In a reusable workflow, they give Build Level 3.
+
+[[COD-805]]
+*COD-805.* Each job that runs steps MUST set `timeout-minutes`.
+Each workflow that deploys or releases MUST set `concurrency`.
+Check: a {abbr-ci-first} search for `timeout-minutes` in each job that has `steps`, as in `examples/check-examples.py`.
+Review checks `concurrency`.
+
+[[COD-806]]
+*COD-806.* A project SHOULD run OpenSSF Scorecard and publish its score.
+Check: the link:https://github.com/ossf/scorecard[Scorecard] workflow.
+
+== Lockfiles of workflows
+
+GitHub announced lockfiles for workflows in public preview on link:https://github.blog/changelog/2026-10-14-github-actions-workflow-lockfiles-in-public-preview/[2026-10-14].
+A lockfile can replace hash pins.
+Reports of general availability disagree, and the plans that get it remain unclear.
+Hash pins under SEC-031 stay the rule.
+A later edition moves to lockfiles once they reach general availability on the free and team plans.
+
+== References
+
+=== Normative
+
+* link:https://docs.github.com/en/actions/reference/security/secure-use[Secure use reference], GitHub Docs. link:https://web.archive.org/web/20261112081530/https://docs.github.com/en/actions/reference/security/secure-use[Archived copy]
+* link:https://docs.zizmor.sh/audits/[Audit Rules], zizmor, version 1.32.0. link:https://web.archive.org/web/20261117041308/https://docs.zizmor.sh/audits/[Archived copy]
+* link:https://github.com/rhysd/actionlint[actionlint], version 1.7.12, 2026-03-30. link:https://web.archive.org/web/20261027101138/https://github.com/rhysd/actionlint[Archived copy]
+* link:https://docs.github.com/en/actions/concepts/security/artifact-attestations[Artifact attestations], GitHub Docs. link:https://web.archive.org/web/20261104200549/https://docs.github.com/en/actions/concepts/security/artifact-attestations[Archived copy]
+
+=== Informative
+
+* link:https://github.com/ossf/scorecard[OpenSSF Scorecard], version 5.6.0. link:https://web.archive.org/web/20261030095710/https://github.com/ossf/scorecard[Archived copy]
+* link:https://github.blog/changelog/2026-10-14-github-actions-workflow-lockfiles-in-public-preview/[GitHub Actions workflow lockfiles in public preview], GitHub Changelog, 2026-10-14. link:https://web.archive.org/web/20261105185839/https://github.blog/changelog/2026-10-14-github-actions-workflow-lockfiles-in-public-preview/[Archived copy]
+
+== Document history
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Change
+|0.1.0 |2026-11-18 |First version.
+|===

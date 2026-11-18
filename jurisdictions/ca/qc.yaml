@@ -1,0 +1,19 @@
+# Comparison data. The format is defined by fpsot-spec-doc (model/jurisdiction.yaml).
+# Québec sets no coding style. Control SA-15 of the 2026 référentiel of the Ministère de la
+# Cybersécurité et du Numérique asks for documented development standards and tools, marked FFF
+# and not mandatory; no archived copy of its PDF exists, so it has no row yet (to be verified at
+# https://www.cyber.gouv.qc.ca/publications/referentiel/sa-15/ref-sa-15.pdf). The article of the
+# LGGRI on free software is also to be verified. This file is informational and not legal advice.
+code: CA-QC
+name: {en: Québec, fr: Québec}
+rows:
+  - id: COD-002
+    text: {en: "The framework on free software covers adoption and licenses, and sets no coding style.", fr: "Le cadre de référence des logiciels libres porte sur l’adoption et les licences, et ne fixe aucun style de code."}
+    status: not-covered
+    source: {title: "Gouvernement du Québec, Cadre de référence des logiciels libres, version 4.1", version: "4.1", date: "2022-12", url: "https://cdn-contenu.quebec.ca/cdn-contenu/gouvernement/SCT/vitrine_numeriQc/gouvernement_ouvert/Logiciel_libre/Cadre_reference_logiciels_libres.pdf", archive: "https://web.archive.org/web/20261103005101/https://cdn-contenu.quebec.ca/cdn-contenu/gouvernement/SCT/vitrine_numeriQc/gouvernement_ouvert/Logiciel_libre/Cadre_reference_logiciels_libres.pdf"}
+    last_checked: "2026-11-17"
+  - id: COD-014
+    text: {en: "When the public administration releases code it wrote, the LiLiQ licenses should be its preferred choice. The framework asks for no header in each file.", fr: "Quand l’administration publique libère le code qu’elle a produit, les licences LiLiQ devraient être son choix privilégié. Le cadre ne demande aucun en-tête dans chaque fichier."}
+    status: looser
+    source: {title: "Gouvernement du Québec, Cadre de référence des logiciels libres, version 4.1", version: "4.1", date: "2022-12", url: "https://cdn-contenu.quebec.ca/cdn-contenu/gouvernement/SCT/vitrine_numeriQc/gouvernement_ouvert/Logiciel_libre/Cadre_reference_logiciels_libres.pdf", archive: "https://web.archive.org/web/20261103005101/https://cdn-contenu.quebec.ca/cdn-contenu/gouvernement/SCT/vitrine_numeriQc/gouvernement_ouvert/Logiciel_libre/Cadre_reference_logiciels_libres.pdf"}
+    last_checked: "2026-11-17"

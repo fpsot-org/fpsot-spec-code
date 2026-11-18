@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+# Example for COD-750 and COD-751: hadolint 2.15.1.
+failure-threshold: warning
+override:
+  error:
+    - DL3002 # the last USER is not root
+    - DL3006 # each image names a tag
+    - DL3007 # no "latest" tag
+trustedRegistries:
+  - registry.access.redhat.com
+  - quay.io

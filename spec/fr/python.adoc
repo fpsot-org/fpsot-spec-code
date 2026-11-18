@@ -1,0 +1,83 @@
+= Python
+include::_fpsot-terms.adoc[]
+
+Cette page vise Python, que la {abbr-fpsot-first} emploie seulement pour l’outillage.
+Les services que livre la {abbr-fpsot} s’exécutent en Java ou en Go.
+
+[cols="1,3"]
+|===
+|Rôle responsable |Responsable des scripts du groupe de travail
+|Dernière révision |2026-11-18
+|Réviser au plus tard le |2027-11-18
+|===
+
+== Outils de l’édition 2026
+
+[cols="2,1,3",options="header"]
+|===
+|Outil |Version |Rôle
+|Python |3.12 ou plus récent, 3.14 en {abbr-ci-first} |Exécute les outils.
+|Ruff |0.17.5 |Analyse et met en forme le code.
+|mypy |2.4.1 |Vérifie les types.
+|uv |0.13.9 |Verrouille les dépendances.
+|===
+
+== Règles
+
+[[COD-900]]
+*COD-900.* Un service que livre la {abbr-fpsot} NE DOIT PAS s’exécuter en Python.
+Python PEUT servir aux outils, aux vérifications et aux scripts d’une construction.
+Vérification : revue.
+
+[[COD-901]]
+*COD-901.* Un projet DOIT déclarer `requires-python = ">=3.12"` ou un plancher plus récent.
+L’{abbr-ci} DOIT s’exécuter sur Python 3.14.
+Vérification : revue de `pyproject.toml` et des tâches d’{abbr-ci}.
+
+La link:https://devguide.python.org/versions/[page des versions de Python] montre que la version 3.10 a atteint sa fin de vie en octobre 2026.
+
+[[COD-902]]
+*COD-902.* Le code DOIT réussir `ruff check`, avec les règles de sécurité `S` activées, ainsi que `ruff format --check`.
+Il DOIT réussir une vérification stricte des types, avec `mypy --strict` ou pyright en mode strict.
+Vérification : link:https://docs.astral.sh/ruff/rules/[Ruff] et link:https://mypy.readthedocs.io/en/stable/[mypy] en {abbr-ci}.
+
+[[COD-903]]
+*COD-903.* Un projet DOIT verrouiller ses dépendances.
+Le verrouillage DOIT passer par `uv.lock`, par des métadonnées intégrées au script selon la PEP 723, ou par des empreintes.
+Les empreintes figurent alors dans un fichier d’exigences.
+Vérification : revue, et `uv lock --check` là où `uv.lock` existe.
+
+La link:https://peps.python.org/pep-0723/[PEP 723] permet à un script de déclarer ses propres dépendances.
+L’outil link:https://docs.astral.sh/uv/concepts/projects/sync/[uv] garde le fichier de verrouillage en phase avec le projet.
+C’est le mécanisme de Python pour SEC-030.
+
+[[COD-904]]
+*COD-904.* Le code NE DOIT PAS appeler `subprocess` avec `shell=True`, ni `eval` ou `exec`, sur des données externes.
+Il NE DOIT PAS charger des données externes avec `pickle` ou avec un chargeur YAML non sécuritaire.
+Il NE DOIT PAS analyser du {abbr-xml-first} externe avec un analyseur qui résout les entités.
+Vérification : les règles `S` de Ruff, et revue.
+
+La link:https://docs.python.org/3/library/subprocess.html[documentation de subprocess] et la link:https://docs.python.org/3/library/pickle.html[documentation de pickle] mettent en garde contre ces usages.
+
+== Références
+
+=== Références normatives
+
+* link:https://devguide.python.org/versions/[Status of Python versions], Python Developer's Guide. link:https://web.archive.org/web/20261117093227/https://devguide.python.org/versions/[Copie archivée]
+* link:https://docs.astral.sh/ruff/rules/[Rules], Ruff, version 0.17.5. link:https://web.archive.org/web/20261111114016/https://docs.astral.sh/ruff/rules/[Copie archivée]
+* link:https://mypy.readthedocs.io/en/stable/[mypy documentation], version 2.4.1. link:https://web.archive.org/web/20261111045157/https://mypy.readthedocs.io/en/stable/[Copie archivée]
+* link:https://peps.python.org/pep-0723/[PEP 723, Inline script metadata], Python Software Foundation. link:https://web.archive.org/web/20261104201106/https://peps.python.org/pep-0723/[Copie archivée]
+
+=== Références informatives
+
+* link:https://docs.astral.sh/uv/concepts/projects/sync/[Locking and syncing], uv documentation, version 0.13.9. link:https://web.archive.org/web/20261117135621/https://docs.astral.sh/uv/concepts/projects/sync/[Copie archivée]
+* link:https://docs.python.org/3/library/subprocess.html[subprocess, Subprocess management], Python documentation. link:https://web.archive.org/web/20261117132753/https://docs.python.org/3/library/subprocess.html[Copie archivée]
+* link:https://docs.python.org/3/library/pickle.html[pickle, Python object serialization], Python documentation. link:https://web.archive.org/web/20261117152923/https://docs.python.org/3/library/pickle.html[Copie archivée]
+
+== Historique du document
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Changement
+|0.1.0 |2026-11-18 |Première version.
+|===

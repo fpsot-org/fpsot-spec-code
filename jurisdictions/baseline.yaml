@@ -1,12 +1,52 @@
 # Comparison data. The format is defined by fpsot-spec-doc (model/jurisdiction.yaml).
-# This example row compares requirement TPL-001. Replace it with the rows of this specification.
-# Add one file per jurisdiction, such as ca.yaml or ca/qc.yaml, only when a source exists.
+# Governments set rules on publishing and licensing code, not on coding style. The international
+# column draws on the OpenSSF badge, the GDS Way, the CWE Top 25, OWASP ASVS and NIST SSDF.
+# This file is informational and not legal advice.
 topics:
-  keywords: {en: Requirement keywords, fr: Mots clés des exigences}
+  style: {en: Coding style and tools, fr: Style de code et outils}
+  secure-coding: {en: Secure coding, fr: Codage sécurisé}
+  builds: {en: Toolchains and builds, fr: Chaînes d’outils et construction}
+  licensing: {en: Licenses and publishing, fr: Licences et publication}
 rows:
-  - id: TPL-001
-    topic: keywords
-    requirement: {en: Use the BCP 14 keywords., fr: Utiliser les mots clés du BCP 14.}
-    international: {en: "BCP 14 defines MUST, SHOULD and MAY. Only the capital forms carry that meaning.", fr: "Le BCP 14 définit MUST, SHOULD et MAY. Seules les majuscules ont ce sens."}
-    international_source: {title: "RFC 8174, Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words (BCP 14)", version: "BCP 14", date: "2017-05", url: "https://www.rfc-editor.org/info/rfc8174", archive: "https://web.archive.org/web/20261103005743/https://www.rfc-editor.org/info/rfc8174/"}
-    fpsot: {en: "Keywords in capitals, with a fixed French mapping.", fr: "Mots clés en majuscules, avec une correspondance française fixe."}
+  - id: COD-002
+    topic: style
+    requirement: {en: "Pin one formatter and one set of linters for each language, and fail CI on any change or error.", fr: "Épingler un outil de mise en forme et un ensemble d’analyseurs pour chaque langage, et faire échouer l’IC à tout changement ou toute erreur."}
+    international: {en: "At silver level, a project names the style guides of its main languages and enforces them automatically where a free tool can.", fr: "Au niveau argent, un projet nomme les guides de style de ses principaux langages et les applique automatiquement là où un outil libre le permet."}
+    international_source: {title: "OpenSSF Best Practices Badge, silver and gold criteria", url: "https://github.com/coreinfrastructure/best-practices-badge/blob/main/docs/other.md", archive: "https://web.archive.org/web/20260227104005/https://github.com/coreinfrastructure/best-practices-badge/blob/main/docs/other.md"}
+    fpsot: {en: "A pinned formatter and linter set for each language, with committed settings, as a required CI check.", fr: "Un outil de mise en forme et des analyseurs épinglés pour chaque langage, avec des paramètres archivés, comme vérification obligatoire de l’IC."}
+  - id: COD-003
+    topic: style
+    requirement: {en: "Enforce each rule that a tool can check with that tool in CI, and keep prose rules for the rest.", fr: "Appliquer chaque règle qu’un outil peut vérifier au moyen de cet outil dans l’IC, et garder les règles rédigées pour le reste."}
+    international: {en: "At passing level, a project turns on compiler warnings, a safe language mode or a linter, and addresses the warnings.", fr: "Au niveau de base, un projet active les avertissements du compilateur, un mode sûr du langage ou un analyseur statique, et traite les avertissements."}
+    international_source: {title: "OpenSSF Best Practices Badge, passing criteria", url: "https://github.com/coreinfrastructure/best-practices-badge/blob/main/docs/criteria.md", archive: "https://web.archive.org/web/20260206131755/https://github.com/coreinfrastructure/best-practices-badge/blob/main/docs/criteria.md"}
+    fpsot: {en: "Each rule names its check: a tool in CI, or review when no reliable tool exists.", fr: "Chaque règle nomme sa vérification : un outil dans l’IC, ou la revue quand aucun outil fiable n’existe."}
+  - id: COD-005
+    topic: style
+    requirement: {en: "Give each language page an owner role and a review-by date no more than 12 months after its last review.", fr: "Donner à chaque page de langage un rôle responsable et une date de révision au plus 12 mois après la dernière révision."}
+    international: {en: "The GDS Way keeps one short page per language, which leaves layout to tools and shows an owning team and review dates.", fr: "Le GDS Way tient une courte page par langage, qui confie la mise en page aux outils et indique une équipe responsable et des dates de révision."}
+    international_source: {title: "The GDS Way, Programming languages, Government Digital Service", url: "https://gds-way.digital.cabinet-office.gov.uk/manuals/programming-languages.html", archive: "https://web.archive.org/web/20261112234627/https://gds-way.digital.cabinet-office.gov.uk/manuals/programming-languages.html"}
+    fpsot: {en: "Thirteen language pages, each with an owner role, a last review date, a review-by date and a table of tool versions.", fr: "Treize pages de langage, chacune avec un rôle responsable, une date de dernière révision, une date limite de révision et une table des versions d’outils."}
+  - id: COD-013
+    topic: secure-coding
+    requirement: {en: "Keep on each rule of the security analyzers that the language pages name.", fr: "Garder active chaque règle des analyseurs de sécurité que nomment les pages de langage."}
+    international: {en: "MITRE ranks the 25 most dangerous software weaknesses of 2025, led by cross-site scripting and SQL injection.", fr: "MITRE classe les 25 faiblesses logicielles les plus dangereuses de 2025, en tête desquelles le script intersite et l’injection SQL."}
+    international_source: {title: "2025 CWE Top 25 Most Dangerous Software Weaknesses, MITRE", date: "2025-12", url: "https://cwe.mitre.org/top25/archive/2025/2025_cwe_top25.html", archive: "https://web.archive.org/web/20261103161603/https://cwe.mitre.org/top25/archive/2025/2025_cwe_top25.html"}
+    fpsot: {en: "No rule of a named security analyzer is turned off, except through a SEC-016 exception. The common page maps the analyzers to the list.", fr: "Aucune règle d’un analyseur de sécurité nommé n’est désactivée, sauf par une exception selon SEC-016. La page commune associe les analyseurs à la liste."}
+  - id: COD-607
+    topic: secure-coding
+    requirement: {en: "Keep keyed data from outside in a Map or a Set, so that it cannot pollute prototypes.", fr: "Garder les données à clés venues de l’extérieur dans un Map ou un Set, pour qu’elles ne puissent pas polluer les prototypes."}
+    international: {en: "Chapter V15 of ASVS 5.0 sets secure coding requirements, including protection of JavaScript code against prototype pollution.", fr: "Le chapitre V15 de l’ASVS 5.0 fixe des exigences de codage sécurisé, dont la protection du code JavaScript contre la pollution de prototype."}
+    international_source: {title: "OWASP Application Security Verification Standard 5.0.0, V15 Secure Coding and Architecture", version: "5.0.0", url: "https://github.com/OWASP/ASVS/blob/master/5.0/en/0x24-V15-Secure-Coding-and-Architecture.md", archive: "https://web.archive.org/web/20260824111028/https://github.com/OWASP/ASVS/blob/master/5.0/en/0x24-V15-Secure-Coding-and-Architecture.md"}
+    fpsot: {en: "A MUST in the JavaScript and TypeScript page, checked in review.", fr: "Une obligation de la page sur JavaScript et TypeScript, vérifiée en revue."}
+  - id: COD-016
+    topic: builds
+    requirement: {en: "Declare the version of each toolchain in a committed file that CI reads.", fr: "Déclarer la version de chaque chaîne d’outils dans un fichier archivé que l’IC lit."}
+    international: {en: "The Secure Software Development Framework asks producers to choose and configure their compilers, interpreters and build tools, then use the approved settings.", fr: "Le Secure Software Development Framework demande aux producteurs de choisir et de configurer leurs compilateurs, interprètes et outils de construction, puis d’employer les paramètres approuvés."}
+    international_source: {title: "NIST SP 800-218, Secure Software Development Framework (SSDF) Version 1.1, practice PW.6", version: "1.1", date: "2022-02", url: "https://csrc.nist.gov/pubs/sp/800/218/final", archive: "https://web.archive.org/web/20261117043312/https://csrc.nist.gov/pubs/sp/800/218/final"}
+    fpsot: {en: "Each language page names where its toolchain version lives, such as go.mod or the Maven Enforcer Plugin.", fr: "Chaque page de langage indique où se trouve la version de sa chaîne d’outils, comme go.mod ou le Maven Enforcer Plugin."}
+  - id: COD-014
+    topic: licensing
+    requirement: {en: "Start each source file with an SPDX license identifier.", fr: "Commencer chaque fichier source par un identifiant de licence SPDX."}
+    international: {en: "SPDX defines short license identifiers that a source file can carry in one comment line.", fr: "SPDX définit des identifiants courts de licence qu’un fichier source peut porter dans une ligne de commentaire."}
+    international_source: {title: "Handling License Info, SPDX project", url: "https://spdx.dev/learn/handling-license-info/", archive: "https://web.archive.org/web/20261116203858/https://spdx.dev/learn/handling-license-info/"}
+    fpsot: {en: "A MUST for each file with a comment syntax, until a legal specification sets the allowed licenses.", fr: "Une obligation pour chaque fichier qui admet des commentaires, en attendant qu’une spécification juridique fixe les licences permises."}

@@ -1,8 +1,114 @@
 = Spécification FPSOT sur le code
 include::_fpsot-terms.adoc[]
 
-Remplacez cette page par le texte normatif de la spécification.
-Commencez par la portée, puis les classes de conformité, puis les exigences.
+Cette spécification fixe la façon dont les projets de la {abbr-fpsot-first} écrivent leurs logiciels.
+Elle fixe aussi la façon de les mettre en forme, de les vérifier et de les construire.
+Elle couvre les langages et les types de fichiers de ces projets.
+Cela va de Java et Go aux fichiers de conteneurs et aux flux de travail.
+Un outil de mise en forme et un analyseur statique, aux versions épinglées, tranchent chaque question qu’un outil peut régler.
+Les règles rédigées couvrent seulement ce que les outils ne peuvent pas vérifier.
+
+Les règles se répartissent entre une page commune et une page par langage.
+Chaque page de langage est courte et nomme ses outils et leurs versions.
+Elle a une personne responsable et une date de révision.
+Les versions des outils changent chaque mois, de sorte que chaque page porte la date de sa dernière révision.
+
+== Portée
+
+[[COD-001]]
+*COD-001.* Ces règles visent chaque {term-repository} logiciel de la {abbr-fpsot}, et de chaque projet qui adopte cette spécification.
+Elles couvrent le code source et les fichiers de construction.
+Elles couvrent aussi les scripts, les gabarits et les fichiers de conteneurs.
+Elles couvrent enfin les flux de travail et les fichiers de configuration.
+Le texte d’une spécification suit plutôt la spécification de rédaction de la {abbr-fpsot}.
+Vérification : revue de la portée de chaque déclaration de conformité.
+
+Les règles fixent l’allure du code, les outils qui le vérifient et la façon de le construire.
+Elles ne fixent pas ce que fait le logiciel.
+D’autres spécifications de la {abbr-fpsot} en fixent le comportement, comme ses interfaces, ses journaux et ses tests.
+
+== Les outils tranchent
+
+[[COD-002]]
+*COD-002.* Chaque langage d’un {term-repository} DOIT avoir un outil de mise en forme nommé et un ensemble nommé d’analyseurs statiques.
+Le {term-repository} DOIT épingler chacun d’eux à une version exacte et archiver sa configuration.
+L’{abbr-ci-first} DOIT échouer quand l’outil de mise en forme changerait un fichier, ou quand un analyseur signale une erreur.
+Vérification : la tâche d’{abbr-ci} de chaque langage.
+
+Le link:https://github.com/coreinfrastructure/best-practices-badge/blob/main/docs/other.md[niveau argent du badge OpenSSF Best Practices] demande la même chose.
+Un projet nomme un guide de style pour chaque langage principal.
+Un outil libre l’applique quand il en existe un.
+Le link:https://github.com/alphagov/gds-way/blob/278012d99be4e916c2795a71fa068f37f15d0d28/source/manuals/programming-languages.html.md.erb[GDS Way] du gouvernement britannique suit le même modèle.
+
+[[COD-003]]
+*COD-003.* Une règle qu’un outil peut vérifier DOIT s’exécuter au moyen de cet outil dans l’{abbr-ci}.
+Chaque règle de cette spécification se termine par une ligne qui nomme sa vérification.
+Une règle marquée _revue_ n’a pas d’outil fiable.
+La personne qui révise chaque demande de tirage la vérifie.
+Vérification : revue de chaque modification de cette spécification.
+
+Le link:https://github.com/ANSSI-FR/rust-guide/blob/3f9e2e28095d0eeb35ed61e212a82be12fde4884/src/en/devenv.md[guide Rust de l’agence française de cybersécurité] fait le même partage.
+L’emploi d’un analyseur statique y est une règle, tout comme la vérification de chaque correction automatique.
+
+== Conformité d’un dépôt
+
+[[COD-004]]
+*COD-004.* Un {term-repository} est conforme quand il respecte chaque DOIT de cette page et de la xref:common.adoc[page commune].
+Il DOIT aussi respecter chaque DOIT de la page de chaque langage qu’il contient.
+Les fichiers générés et les copies de code externe suivent COD-011 plutôt que la page de leur langage.
+Vérification : revue.
+
+[[COD-005]]
+*COD-005.* Chaque page de langage DOIT nommer son rôle responsable et la date de sa dernière révision.
+Elle DOIT aussi donner une date limite de révision.
+La date limite DOIT tomber au plus 12 mois après la dernière révision.
+D’ici cette date, la personne responsable DOIT vérifier les versions et les outils de la page.
+Elle publie ensuite le résultat.
+Vérification : revue à chaque version de cette spécification.
+
+Le rôle responsable revient à la personne responsable de ce langage au sein du groupe de travail.
+Tant que le groupe de travail n’a nommé personne, la personne responsable de la maintenance tient ce rôle.
+Une page dont la date limite est passée reste en vigueur, mais ses tableaux de versions peuvent être périmés.
+
+== Pages
+
+* Les xref:common.adoc[règles communes] s’appliquent à chaque langage.
+* Les pages xref:java.adoc[Java], xref:quarkus.adoc[Quarkus] et xref:kotlin.adoc[Kotlin] couvrent le code qui s’exécute sur la plateforme Java.
+* La page xref:go.adoc[Go] couvre les outils, les vérificateurs et les programmes en ligne de commande.
+* Les pages xref:bash.adoc[Bash] et xref:powershell.adoc[PowerShell] couvrent les scripts.
+* Les pages xref:javascript.adoc[JavaScript et TypeScript] et xref:html-css.adoc[HTML et CSS] couvrent ce qui s’exécute dans le navigateur.
+* La page xref:sql.adoc[SQL] couvre les requêtes et les migrations de bases de données.
+* Les pages xref:containers.adoc[Fichiers de conteneur], xref:workflows.adoc[Flux de travail d’IC] et xref:config.adoc[Fichiers de configuration] couvrent ce qui construit les logiciels.
+Elles couvrent aussi ce qui les livre et les configure.
+* La page xref:python.adoc[Python] couvre les scripts d’outillage.
+
+Trois pages informatives suivent les règles.
+
+* La page xref:style-editions.adoc[Éditions de style] énumère les versions des outils de chaque édition et explique comment passer à la suivante.
+* La page xref:overridable-rules.adoc[Règles substituables] décrit un modèle Quarkus pour les règles d’affaires qu’un adoptant peut remplacer.
+Elle passera à la future spécification sur les capacités dès que celle-ci existera.
+* La page xref:to-be-confirmed.adoc[En attente de confirmation] énumère des conseils qui attendent la décision du responsable du projet.
+
+== Niveaux et spécifications connexes
+
+Cette spécification appartient au niveau 1.
+Elle cite par leur numéro les règles des autres spécifications de la {abbr-fpsot} et n’en reformule aucune.
+
+* La spécification sur la sécurité régit l’analyse statique et l’analyse des secrets et des dépendances, selon SEC-012 à SEC-016.
+Elle régit aussi les secrets, selon SEC-020 et SEC-024, et la chaîne d’approvisionnement, selon SEC-030 à SEC-037.
+Cette spécification donne le mécanisme de chaque outil et cite ces règles pour le résultat attendu.
+* La spécification sur la gestion des versions régit les archivages signés, leurs messages et les étiquettes de version.
+Elle les fixe selon VCS-001 à VCS-003 et VCS-106.
+* La spécification sur les tests régit les niveaux de test, les scénarios et les tests de l’artefact construit.
+Elle les fixe selon TST-014, TST-020 et TST-065.
+* La spécification sur le nommage régit chaque nom qui sort du code, comme les paquets, les champs et les chemins.
+Elle les fixe selon NAM-001 à NAM-023.
+* La spécification sur l’observabilité régit la forme des enregistrements de journal, selon OBS-020 et OBS-080.
+* Les spécifications sur l’accessibilité et sur le style régissent les pages et les thèmes, selon ACC-001 et STY-001.
+* La spécification sur les décisions régit la liaison Java d’une décision, selon DEC-021.
+
+Une future spécification sur les capacités régira la façon dont un adoptant remplace une pièce, et la pièce qui l’emporte.
+Une future spécification juridique régira les licences permises et les avis de droit d’auteur.
 
 == Conformité
 
@@ -11,35 +117,26 @@ ____
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 (link:https://www.rfc-editor.org/info/rfc2119[RFC 2119], link:https://www.rfc-editor.org/info/rfc8174[RFC 8174]) when, and only when, they appear in all capitals, as shown here.
 ____
 
-Les mots clés suivent l'exigence WRT-010 de la spécification de rédaction de la {abbr-fpsot-first}.
-La version française emploie les mots clés français de l'exigence WRT-011.
-
-== Exigences
-
-Donnez à chaque exigence une ancre avec son identifiant, juste au-dessus de son paragraphe.
-L'ancre ressemble à `+[[XYZ-001]]+`.
-L'exemple ci-dessous montre la forme. Remplacez-le par la première exigence.
-
-[[TPL-001]]
-*TPL-001.* Un énoncé normatif DOIT employer un des mots clés du {abbr-bcp-first} 14, en majuscules.
-Le mot clé donne sa force à la règle.
+Les mots clés suivent l’exigence WRT-010 de la spécification de rédaction de la {abbr-fpsot}.
+La version française emploie les mots clés français de l’exigence WRT-011.
 
 == Références
-
-Donnez ici chaque source externe que cite cette page, avec la même adresse que son lien dans le texte.
-Chaque entrée donne le titre, l'éditeur, la version, la date et une copie archivée.
 
 === Références normatives
 
 * link:https://www.rfc-editor.org/info/rfc2119[RFC 2119, Key words for use in RFCs to Indicate Requirement Levels], IETF, BCP 14, 1997-03. link:https://web.archive.org/web/20261103005705/https://www.rfc-editor.org/info/rfc2119/[Copie archivée]
 * link:https://www.rfc-editor.org/info/rfc8174[RFC 8174, Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words], IETF, BCP 14, 2017-05. link:https://web.archive.org/web/20261103005743/https://www.rfc-editor.org/info/rfc8174/[Copie archivée]
 
-== Historique du document
+=== Références informatives
 
-Ajoutez une ligne pour chaque version qui modifie cette page.
+* link:https://github.com/coreinfrastructure/best-practices-badge/blob/main/docs/other.md[OpenSSF Best Practices Badge, silver and gold criteria], Open Source Security Foundation, sur GitHub. link:https://web.archive.org/web/20260227104005/https://github.com/coreinfrastructure/best-practices-badge/blob/main/docs/other.md[Copie archivée]
+* link:https://github.com/alphagov/gds-way/blob/278012d99be4e916c2795a71fa068f37f15d0d28/source/manuals/programming-languages.html.md.erb[The GDS Way, Programming languages], Government Digital Service, source à l’archivage 278012d.
+* link:https://github.com/ANSSI-FR/rust-guide/blob/3f9e2e28095d0eeb35ed61e212a82be12fde4884/src/en/devenv.md[Secure Rust Guidelines, Development environment], ANSSI, source à l’archivage 3f9e2e2.
+
+== Historique du document
 
 [cols="1,1,4",options="header"]
 |===
 |Version |Date |Changement
-|0.1.0 |2026-11-03 |Première version.
+|0.1.0 |2026-11-18 |Première version.
 |===
