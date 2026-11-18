@@ -48,7 +48,7 @@ La recherche pour cette spécification n’a pas établi si la version 4.0 elle-
 [[COD-201]]
 *COD-201.* Une extension DOIT avoir un module d’exécution et un module de déploiement.
 Le module d’exécution NE DOIT PAS dépendre d’un artefact de déploiement.
-Vérification : une règle `bannedDependencies` du Maven Enforcer Plugin sur le module d’exécution, qui interdit les artefacts `*-deployment`.
+Vérification : une règle `bannedDependencies` du Maven Enforcer Plugin sur le module d’exécution, qui interdit les artefacts `+*-deployment+`.
 
 [[COD-202]]
 *COD-202.* Les étapes de construction DOIVENT communiquer entre elles uniquement par des éléments de construction.
@@ -78,8 +78,8 @@ La link:https://quarkus.io/guides/cdi-reference[référence CDI de Quarkus] expl
 La réflexion coûte du temps au démarrage et demande des réglages de plus dans une image native.
 
 [[COD-205]]
-*COD-205.* Les paquets du domaine et des ports d’une bibliothèque de la {abbr-fpsot-first} NE DOIVENT PAS importer `jakarta.*`.
-Ils NE DOIVENT PAS non plus importer `io.quarkus.*`.
+*COD-205.* Les paquets du domaine et des ports d’une bibliothèque de la {abbr-fpsot-first} NE DOIVENT PAS importer `+jakarta.*+`.
+Ils NE DOIVENT PAS non plus importer `+io.quarkus.*+`.
 Cette règle étend au cadriciel la règle sur les paquets de COD-114.
 Vérification : un test ArchUnit, selon COD-104.
 

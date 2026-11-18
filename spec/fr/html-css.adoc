@@ -58,7 +58,7 @@ Les blocs que rédige la {abbr-fpsot-first} DEVRAIENT nommer leurs classes à la
 Un projet DEVRAIT employer les composants et les jetons de PatternFly avant d’écrire les siens.
 Vérification : revue.
 
-link:https://cube.fyi/[CUBE CSS] et link:https://getbem.com/[BEM] vont bien ensemble.
+link:https://cube.fyi/[CUBE CSS] et link:https://github.com/getbem/getbem.com[BEM] vont bien ensemble.
 CUBE ordonne les couches, et BEM nomme les blocs qu’elles contiennent.
 
 == Références
@@ -74,7 +74,7 @@ CUBE ordonne les couches, et BEM nomme les blocs qu’elles contiennent.
 * link:https://github.com/AndyOGo/stylelint-declaration-strict-value[stylelint-declaration-strict-value], version 1.13.0. link:https://web.archive.org/web/20260827165949/https://github.com/AndyOGo/stylelint-declaration-strict-value[Copie archivée]
 * link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src[CSP: script-src], MDN Web Docs. link:https://web.archive.org/web/20250312043548/https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src[Copie archivée]
 * link:https://cube.fyi/[CUBE CSS], Andy Bell. link:https://web.archive.org/web/20261029084217/https://cube.fyi/[Copie archivée]
-* link:https://getbem.com/[BEM, Block Element Modifier]. link:https://web.archive.org/web/20261001124241/http://getbem.com/[Copie archivée]
+* link:https://github.com/getbem/getbem.com[BEM, Block Element Modifier]. link:https://web.archive.org/web/20261001124241/http://getbem.com/[Copie archivée]
 
 == Historique du document
 

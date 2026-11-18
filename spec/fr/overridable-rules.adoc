@@ -15,7 +15,7 @@ Aucun document de Quarkus ne présente cette combinaison comme un patron officie
 Le patron compte trois éléments.
 
 . Un module de règles contient l’interface de la règle et sa classe par défaut, en Java ordinaire.
-Il n’importe rien de `jakarta.*` ni de `io.quarkus.*`, selon COD-205.
+Il n’importe rien de `+jakarta.*+` ni de `+io.quarkus.*+`, selon COD-205.
 . Le module d’exécution de l’extension expose la classe par défaut comme un bean.
 Ce bean s’efface quand l’application en fournit un autre.
 . L’application remplace la classe par défaut en déclarant son propre bean.

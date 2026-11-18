@@ -15,7 +15,7 @@ No Quarkus document names this combination as an official pattern.
 The pattern has three parts.
 
 . A rule module holds the interface of the rule and its default class, in plain Java.
-It imports nothing from `jakarta.*` or `io.quarkus.*`, under COD-205.
+It imports nothing from `+jakarta.*+` or `+io.quarkus.*+`, under COD-205.
 . The runtime module of the extension exposes the default as a bean.
 That bean backs off when the application supplies another one.
 . The application replaces the default by declaring its own bean.

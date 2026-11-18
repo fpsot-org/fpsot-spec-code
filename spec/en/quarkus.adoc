@@ -47,7 +47,7 @@ The research for this specification did not find whether 4.0 itself will have it
 [[COD-201]]
 *COD-201.* An extension MUST have a runtime module and a deployment module.
 The runtime module MUST NOT depend on a deployment artifact.
-Check: a `bannedDependencies` rule of the Maven Enforcer Plugin on the runtime module, which bans `*-deployment` artifacts.
+Check: a `bannedDependencies` rule of the Maven Enforcer Plugin on the runtime module, which bans `+*-deployment+` artifacts.
 
 [[COD-202]]
 *COD-202.* Build steps MUST talk to each other only through build items.
@@ -77,7 +77,7 @@ The link:https://quarkus.io/guides/cdi-reference[Quarkus CDI reference] explains
 Reflection costs time at startup and needs extra setup in a native image.
 
 [[COD-205]]
-*COD-205.* The domain and port packages of a library of the {abbr-fpsot-first} MUST NOT import `jakarta.*` or `io.quarkus.*`.
+*COD-205.* The domain and port packages of a library of the {abbr-fpsot-first} MUST NOT import `+jakarta.*+` or `+io.quarkus.*+`.
 This extends the package rule of COD-114 to the framework.
 Check: an ArchUnit test, under COD-104.
 
