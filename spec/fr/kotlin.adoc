@@ -1,0 +1,96 @@
+= Kotlin
+include::_fpsot-terms.adoc[]
+
+Cette page couvre le code Kotlin.
+Les projets de la {abbr-fpsot-first} emploient Kotlin pour une partie du code serveur.
+Ils l’emploient aussi pour la logique que partagent les navigateurs ou les applications mobiles.
+Le code serveur en Kotlin suit aussi la page xref:quarkus.adoc[Quarkus].
+
+[cols="1,3"]
+|===
+|Rôle responsable |Responsable Kotlin du groupe de travail
+|Dernière révision |2026-11-18
+|Réviser au plus tard le |2027-11-18
+|===
+
+== Outils de l’édition 2026
+
+[cols="2,1,3",options="header"]
+|===
+|Outil |Version |Rôle
+|Kotlin |la version de la plateforme Quarkus, ou 2.4 hors de Quarkus |Compile le code.
+|ktlint |1.8.0 |Met le code en forme et en vérifie le style.
+|detekt |1.23.8 |Analyse statique.
+|===
+
+== Règles
+
+[[COD-300]]
+*COD-300.* Le code Kotlin d’un projet Quarkus DOIT employer la version de Kotlin que gère la plateforme Quarkus.
+Ses beans DOIVENT employer le plugiciel du compilateur `all-open`.
+Ils DOIVENT recevoir leurs dépendances par leur constructeur.
+Vérification : revue du fichier de construction.
+
+Le link:https://quarkus.io/guides/kotlin[guide de Quarkus sur Kotlin] déconseille une autre version de Kotlin dans une application Quarkus.
+
+[[COD-301]]
+*COD-301.* Le code Kotlin DOIT suivre les link:https://kotlinlang.org/docs/coding-conventions.html[conventions de codage officielles de Kotlin].
+L’outil link:https://pinterest.github.io/ktlint/[ktlint] DOIT les vérifier avec le style de code `ktlint_official`, fixé dans `.editorconfig`.
+L’outil link:https://detekt.dev/[detekt] DOIT servir d’analyseur statique.
+Vérification : ktlint et detekt dans l’{abbr-ci-first}.
+
+La plus récente version stable de detekt est 1.23.8.
+La version 2.0 était encore en alpha à la date de cette révision.
+La prochaine édition passera à 2.0 dès qu’elle sera stable.
+
+[[COD-302]]
+*COD-302.* Une bibliothèque Kotlin DOIT activer le mode d’API explicite du compilateur.
+Vérification : le compilateur, qui échoue alors sur une déclaration publique sans visibilité ou type explicite.
+
+Les link:https://kotlinlang.org/docs/api-guidelines-introduction.html[lignes directrices de Kotlin pour les auteurs de bibliothèques] décrivent ce mode.
+
+[[COD-303]]
+*COD-303.* Un résultat d’affaires attendu DOIT être une valeur d’un type scellé, comme en Java selon COD-105.
+Une interface publique NE DOIT PAS exposer `kotlin.Result` ni un type `Either` d’une autre bibliothèque pour les résultats du domaine.
+Une fonction que le code Java appelle et qui peut lever une exception DOIT déclarer `@Throws`.
+Vérification : revue.
+
+Un même modèle d’erreurs sert alors les deux langages de la plateforme Java.
+Le link:https://kotlinlang.org/docs/java-to-kotlin-interop.html[guide sur l’appel de Kotlin depuis Java] explique `@Throws`.
+
+[[COD-304]]
+*COD-304.* Le code partagé avec un navigateur ou une application mobile DOIT résider dans un ensemble de sources `commonMain`.
+Cet ensemble NE DOIT PAS contenir de code de cadriciel.
+Un tel module PEUT se construire avec Gradle, selon COD-107.
+Le code qui cible WebAssembly DOIT rester dans des projets pilotes tant que cette cible est en bêta.
+Vérification : revue.
+
+La link:https://kotlinlang.org/docs/multiplatform/supported-platforms.html[page de stabilité de Kotlin Multiplatform] classe Kotlin/Wasm en bêta.
+
+[[COD-305]]
+*COD-305.* Une interface Kotlin qu’appelle du code Java DEVRAIT employer `@JvmOverloads` et `@JvmStatic` là où ils aident les appelants Java.
+Elle DEVRAIT déclarer des types explicites.
+Vérification : revue.
+
+== Références
+
+=== Références normatives
+
+* link:https://quarkus.io/guides/kotlin[Using Kotlin], guides de Quarkus. link:https://web.archive.org/web/20260719130116/https://quarkus.io/guides/kotlin[Copie archivée]
+* link:https://kotlinlang.org/docs/coding-conventions.html[Coding conventions], documentation de Kotlin, JetBrains. link:https://web.archive.org/web/20261114014906/https://kotlinlang.org/docs/coding-conventions.html[Copie archivée]
+* link:https://pinterest.github.io/ktlint/[ktlint], Pinterest, version 1.8.0. link:https://web.archive.org/web/20260424133512/https://pinterest.github.io/ktlint/[Copie archivée]
+* link:https://detekt.dev/[detekt], version 1.23.8. link:https://web.archive.org/web/20261115115114/https://detekt.dev/[Copie archivée]
+
+=== Références informatives
+
+* link:https://kotlinlang.org/docs/api-guidelines-introduction.html[Library authors' guidelines], documentation de Kotlin, JetBrains. link:https://web.archive.org/web/20260702145625/https://kotlinlang.org/docs/api-guidelines-introduction.html[Copie archivée]
+* link:https://kotlinlang.org/docs/java-to-kotlin-interop.html[Calling Kotlin from Java], documentation de Kotlin, JetBrains. link:https://web.archive.org/web/20261114002019/https://kotlinlang.org/docs/java-to-kotlin-interop.html[Copie archivée]
+* link:https://kotlinlang.org/docs/multiplatform/supported-platforms.html[Stability of supported platforms], documentation de Kotlin Multiplatform, JetBrains. link:https://web.archive.org/web/20260905174749/https://kotlinlang.org/docs/multiplatform/supported-platforms.html[Copie archivée]
+
+== Historique du document
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Changement
+|0.1.0 |2026-11-18 |Première version.
+|===

@@ -1,0 +1,59 @@
+= Configuration files
+include::_fpsot-terms.adoc[]
+
+This page covers configuration files in YAML, {abbr-json-first} and TOML.
+Whitespace and encoding follow COD-015, for every file.
+
+[cols="1,3"]
+|===
+|Owner role |Platform lead of the Working Group
+|Last reviewed |2026-11-18
+|Review by |2027-11-18
+|===
+
+== Tools of edition 2026
+
+[cols="2,1,3",options="header"]
+|===
+|Tool |Version |Role
+|yamllint |1.38.0 |Lints YAML files.
+|check-jsonschema |0.39.0 |Checks files against their schema.
+|===
+
+== Rules
+
+[[COD-850]]
+*COD-850.* YAML files MUST pass yamllint with a committed configuration.
+The configuration MUST allow only `true` and `false` as truth values, and MUST treat a repeated key as an error.
+Check: link:https://yamllint.readthedocs.io/en/stable/[yamllint] in {abbr-ci-first}, with its rules `truthy` and `key-duplicates`.
+
+YAML 1.1 reads words such as `yes` and `on` as truth values, which surprises readers and tools.
+The file `examples/.yamllint.yaml` shows a configuration.
+
+[[COD-851]]
+*COD-851.* The {abbr-ci} MUST check each configuration file that has a published schema against it.
+Check: link:https://check-jsonschema.readthedocs.io/en/stable/[check-jsonschema] in {abbr-ci}.
+
+check-jsonschema includes the schemas of GitHub workflows and of Dependabot, among others.
+
+[[COD-852]]
+*COD-852.* Each configuration format that {abbr-fpsot-first} defines MUST ship a {abbr-json} Schema in the link:https://json-schema.org/draft/2020-12[2020-12 draft].
+Check: review.
+
+The {abbr-fpsot} interface rules use the same draft, under API-023.
+
+== References
+
+=== Normative
+
+* link:https://yamllint.readthedocs.io/en/stable/[yamllint documentation], version 1.38.0. link:https://web.archive.org/web/20261005161331/https://yamllint.readthedocs.io/en/stable/[Archived copy]
+* link:https://check-jsonschema.readthedocs.io/en/stable/[check-jsonschema documentation], version 0.39.0. link:https://web.archive.org/web/20260624064213/https://check-jsonschema.readthedocs.io/en/stable/[Archived copy]
+* link:https://json-schema.org/draft/2020-12[JSON Schema, draft 2020-12], JSON Schema organization. link:https://web.archive.org/web/20261112182939/https://json-schema.org/draft/2020-12[Archived copy]
+
+== Document history
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Change
+|0.1.0 |2026-11-18 |First version.
+|===

@@ -1,0 +1,118 @@
+= PowerShell
+include::_fpsot-terms.adoc[]
+
+This page covers PowerShell scripts and modules.
+Public bodies run many Windows hosts, and {abbr-fpsot-first} needs PowerShell to install and operate software on them.
+
+[cols="1,3"]
+|===
+|Owner role |Scripting lead of the Working Group
+|Last reviewed |2026-11-18
+|Review by |2027-11-18
+|===
+
+== Tools of edition 2026
+
+[cols="2,1,3",options="header"]
+|===
+|Tool |Version |Role
+|PowerShell |7.6 long-term support |Runs scripts on any system.
+|Windows PowerShell |5.1 |Runs scripts on Windows hosts that have nothing newer.
+|PSScriptAnalyzer |1.25.0 |Lints and formats scripts.
+|Pester |6.2.0 |Tests scripts.
+|===
+
+The link:https://learn.microsoft.com/en-us/powershell/scripting/install/powershell-support-lifecycle?view=powershell-7.6[support lifecycle of PowerShell] gives 7.6 support until 2028-11-14.
+Windows PowerShell 5.1 ships with Windows and follows its lifecycle.
+
+== Rules
+
+[[COD-550]]
+*COD-550.* Each script and each module MUST declare the version it needs, with `#Requires -Version 5.1` or `#Requires -Version 7.6`.
+The {abbr-ci-first} MUST test it on each edition that it declares.
+A script for 5.1 also runs on 7.6, so the {abbr-ci} tests it on both.
+Check: review of the {abbr-ci} jobs.
+
+[[COD-551]]
+*COD-551.* Each {term-repository} MUST lint its scripts with PSScriptAnalyzer and a committed settings file.
+The settings MUST turn on the formatting rules, which are off by default.
+They MUST also turn on `PSUseCompatibleSyntax`, with the targets `'5.1'` and `'7.0'`.
+Check: `Invoke-ScriptAnalyzer` with that settings file in {abbr-ci}.
+
+The link:https://learn.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/rules/readme?view=ps-modules[list of PSScriptAnalyzer rules] marks which rules are off by default.
+The link:https://learn.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/using-scriptanalyzer?view=ps-modules[guide on PSScriptAnalyzer] describes the settings file.
+The file `examples/PSScriptAnalyzerSettings.psd1` shows one.
+The rule documentation gives versions such as `'7.0'` and `'5.1'`, so `'7.0'` stands for the syntax of PowerShell 7.
+
+[[COD-552]]
+*COD-552.* Scripts MUST use only approved verbs in function names, and full command names instead of aliases.
+They MUST pass parameters by name.
+They MUST NOT call `Invoke-Expression`, or hold a password or a key in plain text.
+Check: the default rules of PSScriptAnalyzer, such as `PSUseApprovedVerbs` and `PSAvoidUsingInvokeExpression`.
+
+The link:https://learn.microsoft.com/en-us/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands?view=powershell-7.5[list of approved verbs] comes from Microsoft.
+
+[[COD-553]]
+*COD-553.* A module MUST export its functions by explicit name, never with a wildcard.
+It MUST NOT dot-source script files.
+Check: the rule `PSUseConstrainedLanguageMode`, or review.
+
+Under App Control for Business, PowerShell runs untrusted scripts in constrained language mode.
+The link:https://learn.microsoft.com/en-us/powershell/scripting/security/app-control/how-app-control-works?view=powershell-7.5[Microsoft guide on App Control] asks modules to avoid dot-sourcing and wildcard exports.
+
+[[COD-554]]
+*COD-554.* Each released script and module MUST carry an Authenticode signature.
+Install guides MUST NOT tell users to set the execution policy to `Bypass` for the whole machine.
+Check: review of the release workflow and of the guides.
+
+The link:https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.5[documentation of execution policies] says that the policy is no security boundary.
+A signature, described in link:https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_signing?view=powershell-7.5[about_Signing], lets a host trust the script.
+
+[[COD-555]]
+*COD-555.* Each function MUST declare `[CmdletBinding()]`, which makes it an advanced function.
+Code that handles an error MUST use `try` and `catch` with `-ErrorAction Stop` on the command.
+A `catch` block MUST NOT be empty.
+Check: PSScriptAnalyzer, with `PSAvoidUsingEmptyCatchBlock`, and review.
+
+[[COD-556]]
+*COD-556.* A script for hosts under App Control SHOULD pass the rule `PSUseConstrainedLanguageMode`.
+Check: PSScriptAnalyzer with that rule turned on.
+
+[[COD-557]]
+*COD-557.* Scripts and modules SHOULD have link:https://github.com/pester/Pester/releases[Pester] tests that run in {abbr-ci} on each declared edition.
+Check: review.
+
+[[COD-558]]
+*COD-558.* A script SHOULD read secrets through the SecretManagement module, never from a file in the {term-repository}.
+Check: review, and the secret scan of SEC-013.
+
+This is a SHOULD because the last release of SecretManagement dates from 2022.
+The owner of this page checks its maintenance at each review.
+
+The community guide link:https://poshcode.gitbook.io/powershell-practice-and-style[PowerShell Practice and Style] gives more advice.
+Its license asks that copies share it alike, so this page only summarizes ideas from it.
+
+== References
+
+=== Normative
+
+* link:https://learn.microsoft.com/en-us/powershell/scripting/install/powershell-support-lifecycle?view=powershell-7.6[PowerShell Support Lifecycle], Microsoft Learn. link:https://web.archive.org/web/20261116001026/https://learn.microsoft.com/en-us/powershell/scripting/install/powershell-support-lifecycle?view=powershell-7.6[Archived copy]
+* link:https://learn.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/rules/readme?view=ps-modules[PSScriptAnalyzer rules], Microsoft Learn, PSScriptAnalyzer 1.25.0. link:https://web.archive.org/web/20261015090528/https://learn.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/rules/readme?view=ps-modules[Archived copy]
+* link:https://learn.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/using-scriptanalyzer?view=ps-modules[Using PSScriptAnalyzer], Microsoft Learn. link:https://web.archive.org/web/20261015090528/https://learn.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/using-scriptanalyzer?view=ps-modules[Archived copy]
+* link:https://learn.microsoft.com/en-us/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands?view=powershell-7.5[Approved Verbs for PowerShell Commands], Microsoft Learn. link:https://web.archive.org/web/20260910125704/https://learn.microsoft.com/en-us/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands?view=powershell-7.5[Archived copy]
+* link:https://learn.microsoft.com/en-us/powershell/scripting/security/app-control/how-app-control-works?view=powershell-7.5[How App Control works with PowerShell], Microsoft Learn. link:https://web.archive.org/web/20251105032730/https://learn.microsoft.com/en-us/powershell/scripting/security/app-control/how-app-control-works?view=powershell-7.5[Archived copy]
+* link:https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.5[about_Execution_Policies], Microsoft Learn. link:https://web.archive.org/web/20260825001135/https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.5[Archived copy]
+* link:https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_signing?view=powershell-7.5[about_Signing], Microsoft Learn. link:https://web.archive.org/web/20260422070333/https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_signing?view=powershell-7.5[Archived copy]
+
+=== Informative
+
+* link:https://github.com/pester/Pester/releases[Pester releases], version 6.2.0, 2026-09-09. link:https://web.archive.org/web/20241130205204/https://github.com/pester/Pester/releases[Archived copy]
+* link:https://poshcode.gitbook.io/powershell-practice-and-style[PowerShell Practice and Style], PoshCode community, CC BY-SA 4.0. link:https://web.archive.org/web/20261102142720/https://poshcode.gitbook.io/powershell-practice-and-style[Archived copy]
+
+== Document history
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Change
+|0.1.0 |2026-11-18 |First version.
+|===

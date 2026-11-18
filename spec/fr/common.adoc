@@ -1,0 +1,189 @@
+= Règles communes
+include::_fpsot-terms.adoc[]
+
+Ces règles s’appliquent à chaque langage de cette spécification.
+Les pages de langage les complètent et ne les assouplissent jamais.
+
+== Exclusions et code généré
+
+[[COD-010]]
+*COD-010.* Chaque commentaire qui désactive un signalement d’analyseur statique DOIT nommer la règle qu’il désactive.
+Il DOIT donner sa raison dans le même commentaire.
+Il DOIT couvrir la plus petite portée que permet l’outil, par exemple une ligne plutôt qu’un fichier.
+Vérification : l’analyseur `nolintlint` pour Go, avec `require-explanation` et `require-specific` activés.
+La règle `require-description` du plugiciel ESLint comments vérifie TypeScript et JavaScript, et la revue vérifie les autres langages.
+
+Les link:https://golangci-lint.run/docs/linters/configuration/[paramètres de golangci-lint] et le link:https://eslint-community.github.io/eslint-plugin-eslint-comments/rules/require-description.html[plugiciel ESLint comments] imposent cette forme.
+La recherche pour cette spécification n’a trouvé aucun outil qui l’impose pour `@SuppressWarnings` en Java.
+
+[[COD-011]]
+*COD-011.* Le code généré et les copies de code externe DOIVENT se trouver dans des chemins exclus.
+C’est la configuration des outils qui exclut ces chemins.
+Une équipe NE DOIT PAS y désactiver les signalements un commentaire à la fois.
+Un fichier généré DOIT indiquer qu’un outil l’a produit, et personne ne le modifie à la main.
+Vérification : revue de la configuration des outils.
+Pour Go, le paramètre `exclusions.generated` de golangci-lint s’en charge.
+
+[[COD-012]]
+*COD-012.* Un commentaire seul NE DOIT PAS désactiver un signalement élevé ou critique d’un analyseur de sécurité.
+Un tel signalement exige une exception selon SEC-016, avec sa raison, son responsable et sa date de fin.
+Le commentaire qui désactive le signalement DOIT citer cette exception.
+Vérification : revue, selon SEC-010.
+
+[[COD-013]]
+*COD-013.* Une équipe NE DOIT PAS désactiver une règle des analyseurs de sécurité que nomment les pages de langage.
+COD-012 est la seule exception.
+Vérification : revue de la configuration des outils.
+
+Ces analyseurs couvrent plusieurs faiblesses du link:https://cwe.mitre.org/top25/archive/2025/2025_cwe_top25.html[CWE Top 25 de 2025].
+Ils couvrent aussi le chapitre V15 de l’link:https://github.com/OWASP/ASVS/blob/master/5.0/en/0x24-V15-Secure-Coding-and-Architecture.md[OWASP ASVS 5.0], sur le codage sécurisé.
+Le tableau relie certaines d’entre elles aux règles de cette spécification.
+Il est informatif.
+
+[cols="2,3,3",options="header"]
+|===
+|Faiblesse |Règles |Outils
+|CWE-79, script intersite |COD-651, COD-652 |échappement de Qute, Nu HTML Checker, revue
+|CWE-89, injection SQL |COD-704 |SpotBugs avec Find Security Bugs, gosec, revue
+|CWE-78 et CWE-77, injection de commandes |COD-502, COD-552, COD-904 |ShellCheck, PSScriptAnalyzer, règles `S` de Ruff, gosec
+|CWE-94, injection de code |COD-502, COD-552, COD-651, COD-904 |ShellCheck, PSScriptAnalyzer, règles `S` de Ruff
+|CWE-22, traversée de répertoires |COD-104, COD-401 |Find Security Bugs, gosec
+|CWE-476, déréférencement d’un pointeur nul |COD-103 |NullAway
+|CWE-502, désérialisation de données non fiables |COD-106, COD-904 |Find Security Bugs, règles `S` de Ruff
+|CWE-770, allocation sans limite |COD-112 |revue
+|===
+
+== Fichiers et en-têtes
+
+[[COD-014]]
+*COD-014.* Chaque fichier source DOIT commencer par un commentaire `SPDX-License-Identifier` qui nomme sa licence.
+Un fichier dans un format sans commentaires, comme le {abbr-json-first}, en est exempté.
+Vérification : une recherche de cette ligne dans l’{abbr-ci-first}, par exemple avec `grep`.
+
+Le link:https://spdx.dev/learn/handling-license-info/[projet SPDX] décrit cette forme abrégée.
+Une future spécification juridique régira la liste des licences permises et les avis de droit d’auteur.
+D’ici là, cette règle ne garde que l’en-tête.
+
+[[COD-015]]
+*COD-015.* Chaque {term-repository} DOIT avoir un fichier `.editorconfig` à sa racine, avec `root = true`.
+Pour chaque fichier, il DOIT fixer le codage {abbr-utf-8-first} et un saut de ligne final.
+Il DOIT aussi fixer le saut de ligne LF comme fin de chaque ligne.
+Il DOIT aussi retirer les espaces en fin de ligne.
+Les fichiers Markdown et AsciiDoc font exception, car ces espaces y ont un sens.
+Vérification : link:https://github.com/editorconfig-checker/editorconfig-checker[editorconfig-checker] dans l’{abbr-ci}.
+
+Le format link:https://editorconfig.org/[EditorConfig] permet aux éditeurs et aux outils de mise en forme de lire les mêmes paramètres.
+Le fichier `examples/.editorconfig` en montre un.
+
+== Chaînes d’outils et construction
+
+[[COD-016]]
+*COD-016.* Chaque {term-repository} DOIT déclarer la version de la chaîne d’outils de chaque langage dans un fichier qu’il archive.
+L’{abbr-ci} DOIT lire la version dans ce fichier.
+Vérification : revue du flux de travail d’{abbr-ci}.
+
+[cols="1,3",options="header"]
+|===
+|Langage |Emplacement de la version
+|Java et Kotlin |`maven.compiler.release` et la règle `requireJavaVersion` du Maven Enforcer Plugin, selon COD-100 et COD-108
+|Go |les lignes `go` et `toolchain` de `go.mod`, selon COD-400
+|JavaScript et TypeScript |`engines` dans `package.json` et le fichier `.node-version`, selon COD-600
+|Python |`requires-python` dans `pyproject.toml`, selon COD-901
+|PowerShell |la ligne `#Requires -Version` de chaque script, selon COD-550
+|===
+
+[[COD-017]]
+*COD-017.* Un {term-repository} DOIT se construire avec une seule commande, la même sur un portable et dans l’{abbr-ci}.
+Cette commande DOIT employer l’enveloppe archivée ou la chaîne d’outils épinglée.
+Vérification : revue du flux de travail d’{abbr-ci}.
+
+== Éditions de style
+
+[[COD-018]]
+*COD-018.* Certains changements d’un outil de mise en forme ou d’un analyseur reformatent le code existant, ou le font échouer.
+Cette spécification DOIT livrer chacun de ces changements dans une nouvelle édition de style.
+Une nouvelle édition arrive dans une version mineure de cette spécification.
+L’édition précédente DOIT rester conforme pendant au moins 12 mois après la nouvelle.
+Vérification : revue à chaque version de cette spécification.
+
+[[COD-019]]
+*COD-019.* Un {term-repository} DOIT indiquer l’édition de style qu’il suit, dans son fichier `CONTRIBUTING.md`.
+Le passage à une nouvelle édition DOIT reformater le code dans un seul {term-commit} qui ne fait rien d’autre.
+Vérification : revue.
+
+La page xref:style-editions.adoc[Éditions de style] énumère les outils de chaque édition et les étapes d’un passage.
+L’idée vient des link:https://github.com/rust-lang/rust/blob/master/src/doc/style-guide/src/editions.md[éditions de style de Rust].
+Un changement d’outil de mise en forme ne brise alors aucune exécution d’{abbr-ci}.
+Le projet choisit lui-même le moment de passer à la suivante.
+
+== Noms dans le code
+
+[[COD-020]]
+*COD-020.* Les noms à l’intérieur du code DOIVENT suivre les conventions officielles de leur langage.
+C’est le cas des classes, des fonctions et des variables.
+Les analyseurs de chaque page les vérifient.
+Certains noms sortent du code, comme un paquet, un champ d’un message ou une clé de configuration.
+Ces noms DOIVENT suivre la spécification sur le nommage.
+Vérification : les analyseurs de chaque page de langage, et la revue pour les noms qui sortent du code.
+
+La spécification sur le nommage fixe ces noms selon NAM-001 à NAM-023.
+Elle fixe les champs des données selon NAM-040 à NAM-043.
+
+== Versions publiées
+
+[[COD-021]]
+*COD-021.* Chaque version DOIT publier, à côté de chaque artefact, les fichiers que demande la spécification sur la sécurité.
+Ils DOIVENT porter ces noms, pour qu’un outil puisse les trouver.
+
+* La {abbr-sbom-first} en {abbr-json} CycloneDX, nommée `<artifact>.cdx.json`, selon SEC-033 et SEC-034.
+* Sa provenance, selon SEC-035.
+* Sa signature, ou sa ligne dans une liste signée de sommes de contrôle nommée `SHA256SUMS`, selon SEC-036.
+
+Vérification : le flux de travail de publication de COD-804.
+
+[[COD-022]]
+*COD-022.* La construction des archives Java et des binaires Go DOIT être reproductible bit pour bit.
+La construction des exécutables natifs, des images de conteneurs et des paquets npm DEVRAIT être reproductible.
+Un projet DOIT alors énumérer les sources connues d’écarts dans ses notes de version.
+Vérification : le flux de travail de publication reconstruit et compare, selon COD-109 et COD-404.
+
+SEC-037 demande des constructions reproductibles au niveau DEVRAIT.
+Maven et Go rendent cela presque gratuit pour les archives et les binaires, d’où l’obligation ici.
+Aucune source primaire ne montre qu’une image native sort identique à chaque exécution, de sorte qu’elle reste au niveau DEVRAIT.
+
+== Agents
+
+[[COD-023]]
+*COD-023.* Le fichier `AGENTS.md` d’un {term-repository} DEVRAIT renvoyer au fichier de compétence de cette spécification.
+Il DEVRAIT nommer les langages que contient le {term-repository}.
+Il DEVRAIT aussi donner les commandes qui mettent en forme, analysent et testent le code.
+Vérification : revue.
+
+Le link:https://agents.md/[format AGENTS.md] lit le fichier le plus proche du fichier modifié.
+Le link:https://best.openssf.org/Security-Focused-Guide-for-AI-Code-Assistant-Instructions[guide de l’OpenSSF sur les instructions aux assistants de code] donne le contenu de sécurité d’un tel fichier.
+
+== Références
+
+=== Références normatives
+
+* link:https://cwe.mitre.org/top25/archive/2025/2025_cwe_top25.html[2025 CWE Top 25 Most Dangerous Software Weaknesses], MITRE, 2025-12. link:https://web.archive.org/web/20261103161603/https://cwe.mitre.org/top25/archive/2025/2025_cwe_top25.html[Copie archivée]
+* link:https://github.com/OWASP/ASVS/blob/master/5.0/en/0x24-V15-Secure-Coding-and-Architecture.md[OWASP Application Security Verification Standard 5.0.0, V15 Secure Coding and Architecture], OWASP. link:https://web.archive.org/web/20260824111028/https://github.com/OWASP/ASVS/blob/master/5.0/en/0x24-V15-Secure-Coding-and-Architecture.md[Copie archivée]
+* link:https://editorconfig.org/[EditorConfig], équipe EditorConfig. link:https://web.archive.org/web/20261117102634/https://editorconfig.org/[Copie archivée]
+* link:https://spdx.dev/learn/handling-license-info/[Handling License Info], projet SPDX, Linux Foundation. link:https://web.archive.org/web/20261116203858/https://spdx.dev/learn/handling-license-info/[Copie archivée]
+
+=== Références informatives
+
+* link:https://golangci-lint.run/docs/linters/configuration/[Linters settings], golangci-lint, version 2. link:https://web.archive.org/web/20261109231801/https://golangci-lint.run/docs/linters/configuration/[Copie archivée]
+* link:https://eslint-community.github.io/eslint-plugin-eslint-comments/rules/require-description.html[eslint-comments/require-description], ESLint Community. link:https://web.archive.org/web/20260625152725/https://eslint-community.github.io/eslint-plugin-eslint-comments/rules/require-description.html[Copie archivée]
+* link:https://github.com/editorconfig-checker/editorconfig-checker[editorconfig-checker], version 4.0.2, 2026-09-19. link:https://web.archive.org/web/20260819050352/https://github.com/editorconfig-checker/editorconfig-checker[Copie archivée]
+* link:https://github.com/rust-lang/rust/blob/master/src/doc/style-guide/src/editions.md[Rust style editions], The Rust Style Guide. link:https://web.archive.org/web/20250520035929/https://github.com/rust-lang/rust/blob/master/src/doc/style-guide/src/editions.md[Copie archivée]
+* link:https://agents.md/[AGENTS.md], format ouvert pour les agents de programmation. link:https://web.archive.org/web/20261117200853/https://agents.md/[Copie archivée]
+* link:https://best.openssf.org/Security-Focused-Guide-for-AI-Code-Assistant-Instructions[Security-Focused Guide for AI Code Assistant Instructions], Open Source Security Foundation. link:https://web.archive.org/web/20261005132941/https://best.openssf.org/Security-Focused-Guide-for-AI-Code-Assistant-Instructions[Copie archivée]
+
+== Historique du document
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Changement
+|0.1.0 |2026-11-18 |Première version.
+|===

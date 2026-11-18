@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+# Example for COD-850: yamllint 1.38.0.
+extends: default
+rules:
+  truthy:
+    allowed-values: ["true", "false"]
+    check-keys: false
+  key-duplicates: enable
+  document-start: disable
+  line-length:
+    max: 120

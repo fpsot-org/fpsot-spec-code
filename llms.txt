@@ -1,0 +1,40 @@
+# FPSOT code specification
+
+> How FPSOT projects write, format, check and build software: one pinned formatter and linter set per language enforced in CI, prose rules only for what tools cannot check, each rule naming its check; suppressions with reasons, SPDX headers, EditorConfig, declared toolchains, style editions, release file names and reproducible builds; and short pages for Java, Quarkus, Kotlin, Go, Bash, PowerShell, JavaScript and TypeScript, HTML and CSS, SQL, container files, CI workflows, configuration files and Python tooling, each with tool versions, an owner and a review date.
+
+## Specification
+
+- [Overview](spec/en/index.adoc): scope, tools that decide, conformance, owners and review dates; COD-001 to COD-005.
+- [Common rules](spec/en/common.adoc): COD-010 to COD-023.
+- [Java](spec/en/java.adoc): COD-100 to COD-114.
+- [Quarkus](spec/en/quarkus.adoc): COD-200 to COD-213.
+- [Kotlin](spec/en/kotlin.adoc): COD-300 to COD-305.
+- [Go](spec/en/go.adoc): COD-400 to COD-407.
+- [Bash](spec/en/bash.adoc): COD-500 to COD-506.
+- [PowerShell](spec/en/powershell.adoc): COD-550 to COD-558.
+- [JavaScript and TypeScript](spec/en/javascript.adoc): COD-600 to COD-607.
+- [HTML and CSS](spec/en/html-css.adoc): COD-650 to COD-654.
+- [SQL](spec/en/sql.adoc): COD-700 to COD-706.
+- [Container files](spec/en/containers.adoc): COD-750 to COD-754.
+- [CI workflows](spec/en/workflows.adoc): COD-800 to COD-806.
+- [Configuration files](spec/en/config.adoc): COD-850 to COD-852.
+- [Python](spec/en/python.adoc): COD-900 to COD-904.
+- [Style editions](spec/en/style-editions.adoc): informative.
+- [Overridable rules](spec/en/overridable-rules.adoc): informative, moves to the future capability specification.
+- [Awaiting confirmation](spec/en/to-be-confirmed.adoc): informative, guidance that waits for the project lead.
+
+## Examples
+
+- [EditorConfig](examples/.editorconfig)
+- [golangci-lint](examples/.golangci.yml)
+- [ESLint](examples/eslint.config.mjs)
+- [PSScriptAnalyzer](examples/PSScriptAnalyzerSettings.psd1)
+- [Maven Enforcer Plugin](examples/maven-enforcer.xml)
+- [hadolint](examples/.hadolint.yaml), [yamllint](examples/.yamllint.yaml), [zizmor](examples/zizmor.yml)
+- [Workflow that runs actionlint and zizmor](examples/workflow-lint.yml)
+- [How-to guide: put a repository under the specification](docs/modules/en/pages/index.adoc)
+
+## Optional
+
+- [Agent skill](skill/SKILL.md)
+- [Français](spec/fr/index.adoc)

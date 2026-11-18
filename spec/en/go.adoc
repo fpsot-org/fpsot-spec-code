@@ -1,0 +1,120 @@
+= Go
+include::_fpsot-terms.adoc[]
+
+This page covers Go code.
+{abbr-fpsot-first} writes its tools in Go, such as checkers for {abbr-ci-first}, verifiers and command-line programs.
+
+[cols="1,3"]
+|===
+|Owner role |Go lead of the Working Group
+|Last reviewed |2026-11-18
+|Review by |2027-05-18
+|===
+
+== Tools of edition 2026
+
+[cols="2,1,3",options="header"]
+|===
+|Tool |Version |Role
+|Go |1.27.x to build, 1.26 in the `go` line |Compiles and tests code.
+|golangci-lint |2.15.0 |Formats code and runs the linters.
+|govulncheck |the latest release |Finds known weaknesses that the code reaches.
+|===
+
+== Rules
+
+[[COD-400]]
+*COD-400.* A project MUST build with the latest release of the newest supported Go line.
+The `go` line of `go.mod` MUST name the previous supported line, so that both supported lines can build the code.
+A project MUST move to a new major release within 6 months of its release.
+Check: review of `go.mod` and of the {abbr-ci} jobs.
+
+The link:https://go.dev/doc/devel/release[Go release policy] supports each major release until two newer ones exist.
+For this edition, the supported lines are 1.27 and 1.26.
+
+[[COD-401]]
+*COD-401.* Go code MUST pass `golangci-lint fmt` and `golangci-lint run`, with a committed configuration in the format of version 2.
+The configuration MUST keep the `standard` set of linters.
+It MUST add `nolintlint`, `gosec`, `errorlint`, `revive`, `bodyclose` and `contextcheck`.
+The formatters MUST include `gofmt` and `goimports`.
+Check: golangci-lint in {abbr-ci}.
+
+The link:https://golangci-lint.run/docs/configuration/file/[configuration file of golangci-lint] starts with `version: "2"`.
+Version 2 moved the formatters to their own command, and the configuration files of version 1 no longer load.
+The file `examples/.golangci.yml` shows a conforming configuration.
+link:https://go.dev/wiki/CodeReviewComments[Go Code Review Comments] and the link:https://google.github.io/styleguide/go/index[Google Go Style Guide] cover what the linters cannot.
+
+[[COD-402]]
+*COD-402.* The {abbr-ci} MUST run `go vet ./...`, `go test -race ./...` and `govulncheck ./...`.
+Check: those commands in {abbr-ci}.
+
+link:https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck[govulncheck] reports only the weaknesses that the code can reach.
+It is the Go mechanism for SEC-014.
+
+[[COD-403]]
+*COD-403.* The {abbr-ci} MUST set `GOTOOLCHAIN` to an exact version.
+After `go mod tidy`, the {abbr-ci} MUST find no change in `go.mod` or `go.sum`.
+The command `go mod verify` MUST pass, and the {term-repository} MUST commit `go.sum`.
+Check: those commands in {abbr-ci}.
+
+The link:https://go.dev/doc/toolchain[Go toolchain guide] explains the `toolchain` line and `GOTOOLCHAIN`.
+The checksum database verifies each downloaded toolchain.
+Go 1.27 changed some alignment in `gofmt`, so {abbr-ci} and developers need the same toolchain.
+
+[[COD-404]]
+*COD-404.* A release binary MUST build with `CGO_ENABLED=0` and `-trimpath`.
+The release workflow MUST build it twice and compare the results, under COD-022.
+Check: the release workflow.
+
+The link:https://go.dev/blog/rebuild[Go blog on perfectly reproducible builds] gives this command for releases.
+
+[[COD-405]]
+*COD-405.* Code MUST compare errors with `errors.Is`, `errors.As` or `errors.AsType`, never with `==` on a wrapped error.
+It MUST wrap an error with the verb `%w` when the caller may inspect the cause.
+It MUST NOT wrap a pointer to an error whose methods have a value receiver.
+Check: the `errorlint` linter and `go vet`.
+
+link:https://go.dev/doc/go1.26[Go 1.26] added `errors.AsType`.
+In link:https://go.dev/doc/go1.27[Go 1.27], `go vet` reports a `%w` that wraps such a pointer, since `errors.Is` then often fails.
+
+[[COD-406]]
+*COD-406.* A service SHOULD log with `log/slog` and its {abbr-json-first} handler, in the form of OBS-080.
+A parser of outside input SHOULD have a fuzz test, with its corpus under `testdata/fuzz`.
+Check: review.
+
+The link:https://pkg.go.dev/log/slog[slog package] writes structured records.
+The link:https://go.dev/doc/security/fuzz/[Go fuzzing guide] describes the corpus.
+
+[[COD-407]]
+*COD-407.* A command-line program SHOULD exit with 0 on success, 1 on failure and 2 on wrong usage.
+It SHOULD write errors to the standard error stream.
+It SHOULD offer `--help` and `--version`.
+The version SHOULD come from the build data that Go embeds in the binary.
+Check: review.
+
+== References
+
+=== Normative
+
+* link:https://go.dev/doc/devel/release[Release History], The Go Programming Language. link:https://web.archive.org/web/20261116083749/https://go.dev/doc/devel/release[Archived copy]
+* link:https://golangci-lint.run/docs/configuration/file/[Configuration File], golangci-lint, version 2. link:https://web.archive.org/web/20261105024057/https://golangci-lint.run/docs/configuration/file/[Archived copy]
+* link:https://go.dev/doc/toolchain[Go Toolchains], The Go Programming Language. link:https://web.archive.org/web/20261021034706/https://go.dev/doc/toolchain[Archived copy]
+* link:https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck[govulncheck], Go vulnerability management. link:https://web.archive.org/web/20261116105958/https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck[Archived copy]
+
+=== Informative
+
+* link:https://go.dev/wiki/CodeReviewComments[Go Code Review Comments], Go wiki. link:https://web.archive.org/web/20261108091218/https://go.dev/wiki/CodeReviewComments[Archived copy]
+* link:https://google.github.io/styleguide/go/index[Go Style], Google. link:https://web.archive.org/web/20261016184647/https://google.github.io/styleguide/go/index[Archived copy]
+* link:https://go.dev/blog/rebuild[Perfectly Reproducible, Verified Go Toolchains], The Go Blog. link:https://web.archive.org/web/20261107235604/https://go.dev/blog/rebuild[Archived copy]
+* link:https://go.dev/doc/go1.26[Go 1.26 Release Notes], The Go Programming Language. link:https://web.archive.org/web/20261116041539/https://go.dev/doc/go1.26[Archived copy]
+* link:https://go.dev/doc/go1.27[Go 1.27 Release Notes], The Go Programming Language. link:https://web.archive.org/web/20261116122552/https://go.dev/doc/go1.27[Archived copy]
+* link:https://pkg.go.dev/log/slog[Package slog], Go standard library. link:https://web.archive.org/web/20261104134213/https://pkg.go.dev/log/slog[Archived copy]
+* link:https://go.dev/doc/security/fuzz/[Go Fuzzing], The Go Programming Language. link:https://web.archive.org/web/20261111063416/https://go.dev/doc/security/fuzz/[Archived copy]
+
+== Document history
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Change
+|0.1.0 |2026-11-18 |First version.
+|===

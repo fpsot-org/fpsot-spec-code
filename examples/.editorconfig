@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: Apache-2.0
+# Example for COD-015: one file at the root of each repository, checked by editorconfig-checker.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+# Trailing white space can carry meaning in these formats.
+[*.{md,adoc}]
+trim_trailing_whitespace = false
+
+[*.{yml,yaml,json,js,mjs,ts,html,css}]
+indent_size = 2
+
+# COD-501: shfmt reads its indent from here.
+[*.{sh,bash,bats}]
+indent_size = 2
+
+# COD-301: ktlint reads its code style from here.
+[*.{kt,kts}]
+ktlint_code_style = ktlint_official
+
+[*.go]
+indent_style = tab
+
+[Makefile]
+indent_style = tab

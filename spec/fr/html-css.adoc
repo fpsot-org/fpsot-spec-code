@@ -1,0 +1,83 @@
+= HTML et CSS
+include::_fpsot-terms.adoc[]
+
+Cette page vise les gabarits qui produisent du {abbr-html-first}, ainsi que les feuilles de style.
+La spécification sur l’accessibilité fixe ce que les pages doivent offrir aux personnes, à partir d’ACC-001.
+La spécification sur le style fixe les jetons de conception et les thèmes, à partir de STY-001.
+Cette page ajoute les règles mécaniques.
+
+[cols="1,3"]
+|===
+|Rôle responsable |Responsable du Web du groupe de travail
+|Dernière révision |2026-11-18
+|Réviser au plus tard le |2027-11-18
+|===
+
+== Outils de l’édition 2026
+
+[cols="2,1,3",options="header"]
+|===
+|Outil |Version |Rôle
+|Nu HTML Checker |26.11.17 |Vérifie le {abbr-html} produit.
+|stylelint avec stylelint-config-standard |18.0.0 et 41.0.0 |Analyse les feuilles de style.
+|===
+
+== Règles
+
+[[COD-650]]
+*COD-650.* L’{abbr-ci-first} DOIT vérifier les pages produites avec le Nu HTML Checker, et échouer sur une erreur.
+Vérification : le link:https://validator.github.io/validator/[Nu HTML Checker] dans l’{abbr-ci}.
+
+Un gabarit n’est pas encore du {abbr-html}.
+La vérification lit donc les pages que l’application produit pendant ses tests.
+
+[[COD-651]]
+*COD-651.* Les gabarits NE DOIVENT PAS contenir de scripts en ligne, d’attributs `style` ni d’attributs qui gèrent des événements.
+Les scripts DOIVENT fonctionner sous une politique de sécurité du contenu sans `'unsafe-inline'` ni `'unsafe-eval'`.
+Une bibliothèque de scripts qui compile des expressions à l’exécution DOIT alors employer sa version prévue pour les politiques strictes.
+Vérification : un test qui charge chaque page sous cette politique, et la revue.
+
+La link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src[page de MDN sur script-src] explique comment ces mots clés affaiblissent la politique.
+
+[[COD-652]]
+*COD-652.* Un gabarit Qute NE DOIT PAS afficher sans échappement des données qu’une personne a fournies.
+Il NE DOIT PAS appliquer `raw` ou `safe` à de telles données.
+Vérification : une recherche de `raw` et de `safe` dans les gabarits par l’{abbr-ci}, et la revue de chaque résultat.
+
+Le link:https://quarkus.io/guides/qute-reference[guide de référence de Qute] échappe la sortie par défaut dans les gabarits {abbr-html}.
+
+[[COD-653]]
+*COD-653.* Les feuilles de style DOIVENT passer stylelint avec `stylelint-config-standard`.
+Elles DOIVENT prendre les couleurs, les espacements et la typographie dans les propriétés personnalisées du système de design, selon STY-001.
+Vérification : link:https://stylelint.io/[stylelint] dans l’{abbr-ci}, avec des règles qui interdisent les couleurs brutes, comme `color-no-hex` et `color-named`.
+
+[[COD-654]]
+*COD-654.* Les feuilles de style DEVRAIENT ordonner leurs couches avec `@layer`, à la manière de CUBE CSS.
+Les blocs que rédige la {abbr-fpsot-first} DEVRAIENT nommer leurs classes à la manière de BEM.
+Un projet DEVRAIT employer les composants et les jetons de PatternFly avant d’écrire les siens.
+Vérification : revue.
+
+link:https://cube.fyi/[CUBE CSS] et link:https://getbem.com/[BEM] vont bien ensemble.
+CUBE ordonne les couches, et BEM nomme les blocs qu’elles contiennent.
+
+== Références
+
+=== Références normatives
+
+* link:https://validator.github.io/validator/[The Nu Html Checker], version 26.11.17. link:https://web.archive.org/web/20261110063122/https://validator.github.io/validator/[Copie archivée]
+* link:https://quarkus.io/guides/qute-reference[Qute reference guide], Quarkus guides. link:https://web.archive.org/web/20261110031410/https://quarkus.io/guides/qute-reference/[Copie archivée]
+* link:https://stylelint.io/[stylelint], version 18.0.0. link:https://web.archive.org/web/20261109072026/https://stylelint.io/[Copie archivée]
+
+=== Références informatives
+
+* link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src[CSP: script-src], MDN Web Docs. link:https://web.archive.org/web/20250312043548/https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src[Copie archivée]
+* link:https://cube.fyi/[CUBE CSS], Andy Bell. link:https://web.archive.org/web/20261029084217/https://cube.fyi/[Copie archivée]
+* link:https://getbem.com/[BEM, Block Element Modifier]. link:https://web.archive.org/web/20261001124241/http://getbem.com/[Copie archivée]
+
+== Historique du document
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Changement
+|0.1.0 |2026-11-18 |Première version.
+|===

@@ -1,0 +1,182 @@
+= Quarkus
+include::_fpsot-terms.adoc[]
+
+Cette page couvre les applications Quarkus et les extensions Quarkus, en Java ou en Kotlin.
+Leur code suit aussi la page xref:java.adoc[Java] ou la page xref:kotlin.adoc[Kotlin].
+
+[cols="1,3"]
+|===
+|Rôle responsable |Responsable Quarkus du groupe de travail
+|Dernière révision |2026-11-18
+|Réviser au plus tard le |2027-03-18
+|===
+
+La révision vient tôt, car Quarkus 4 approche de sa première version finale.
+
+== Outils de l’édition 2026
+
+[cols="2,1,3",options="header"]
+|===
+|Outil |Version |Rôle
+|Quarkus |3.40, à soutien à long terme |Ligne principale.
+|Quarkus |4.0 |Tâche de compatibilité, dès la sortie de la version finale.
+|Mandrel |25 |Construit les exécutables natifs.
+|quarkus-cyclonedx |la version de la plateforme Quarkus |Produit la nomenclature logicielle.
+|===
+
+== Versions
+
+[[COD-200]]
+*COD-200.* La ligne principale d’un projet DOIT employer la version actuelle de Quarkus à soutien à long terme.
+Pour cette édition, il s’agit de la version 3.40.
+L’{abbr-ci-first} DEVRAIT aussi tester sur la plus récente version de Quarkus.
+Vérification : revue de la version de la plateforme et des tâches d’{abbr-ci}.
+
+La link:https://quarkus.io/releases/[page des versions de Quarkus] donne 3.40 comme version actuelle à soutien à long terme.
+Son soutien dure jusqu’au 2027-09-30.
+Chaque version à long terme reçoit 12 mois de correctifs.
+Un projet passe à la suivante pendant cette période.
+
+Quarkus 4.0 apporte de grands changements, comme Jakarta REST 4, Jakarta Persistence 4.0 et Jackson 3.
+L’équipe Quarkus prévoit sa version finale pour le 2026-11-25.
+Dès sa sortie, les projets ajoutent une tâche d’{abbr-ci} sur 4.x qui ne bloque pas une fusion.
+La ligne principale passe à 4.x dès qu’une version 4.x a un soutien à long terme.
+La recherche pour cette spécification n’a pas établi si la version 4.0 elle-même en aura un.
+
+== Extensions
+
+[[COD-201]]
+*COD-201.* Une extension DOIT avoir un module d’exécution et un module de déploiement.
+Le module d’exécution NE DOIT PAS dépendre d’un artefact de déploiement.
+Vérification : une règle `bannedDependencies` du Maven Enforcer Plugin sur le module d’exécution, qui interdit les artefacts `*-deployment`.
+
+[[COD-202]]
+*COD-202.* Les étapes de construction DOIVENT communiquer entre elles uniquement par des éléments de construction.
+Une étape de construction NE DOIT PAS charger une classe de l’application.
+Elle lit plutôt les classes au moyen de l’index Jandex.
+Vérification : revue.
+
+Le link:https://quarkus.io/guides/writing-extensions[guide sur l’écriture d’extensions] fixe ce modèle.
+Les enregistreurs qui démarrent des serveurs ou des fils relèvent de l’exécution, et non de l’initialisation statique.
+
+[[COD-203]]
+*COD-203.* La configuration d’une extension DOIT employer `@ConfigMapping` avec `@ConfigRoot`, qui nomme sa phase.
+Ses clés DOIVENT se trouver sous `quarkus.<extension>`.
+Chaque propriété DOIT avoir une Javadoc dont la première phrase se suffit à elle-même.
+La configuration d’une application DOIT employer `@ConfigMapping` avec son propre préfixe, jamais `quarkus.`.
+Vérification : revue.
+
+Les secrets ne vont jamais dans `application.properties`, selon SEC-020.
+
+[[COD-204]]
+*COD-204.* Les beans DOIVENT recevoir leurs dépendances par leur constructeur.
+Les champs injectés, les méthodes productrices et les méthodes observatrices DOIVENT avoir la visibilité du paquet, et non être privés.
+Cette règle l’emporte sur l’habitude des membres privés en Java ordinaire.
+Vérification : un test ArchUnit, ou la revue.
+
+La link:https://quarkus.io/guides/cdi-reference[référence CDI de Quarkus] explique qu’un membre privé force l’emploi de la réflexion.
+La réflexion coûte du temps au démarrage et demande des réglages de plus dans une image native.
+
+[[COD-205]]
+*COD-205.* Un module qui contient des règles d’affaires ou des ports NE DOIT PAS importer `jakarta.*` ou `io.quarkus.*`.
+Un test ArchUnit dans ce module DOIT le prouver.
+Vérification : ce test ArchUnit.
+
+Un module de règles sans code de cadriciel s’exécute dans tout programme Java, et un adoptant peut le remplacer.
+La page xref:overridable-rules.adoc[Règles substituables] montre comment une extension expose une telle règle.
+Cette page est informative, car la future spécification sur les capacités régira le contrat des substitutions.
+
+[[COD-206]]
+*COD-206.* Le code des bibliothèques et des extensions NE DOIT PAS chercher des beans par `CDI.current()` ou `Arc.container()`.
+Un bean que le code trouve au moyen de `Instance<T>` DOIT porter `@Unremovable`.
+Vérification : un test ArchUnit, ou la revue.
+
+Quarkus retire les beans inutilisés à la construction.
+Une recherche par nom à l’exécution échappe à cette analyse, et le bean peut avoir disparu.
+
+[[COD-207]]
+*COD-207.* Une extension DOIT inscrire les classes et les ressources dont une image native a besoin.
+Elle les inscrit au moyen d’éléments de construction.
+`ReflectiveClassBuildItem`, `NativeImageResourceBuildItem` et `ServiceProviderBuildItem` servent à cette fin.
+Seule une application PEUT employer `@RegisterForReflection`.
+Une équipe DOIT revoir les métadonnées que produit un agent de traçage avant de les archiver.
+Vérification : revue.
+
+[[COD-208]]
+*COD-208.* Chaque extension DOIT déclarer un `status` honnête dans `quarkus-extension.yaml` : `stable`, `preview` ou `experimental`.
+Elle DOIT déclarer une seule fonctionnalité, et DOIT interroger les capacités plutôt que sonder le chemin des classes.
+Son module de déploiement DOIT la tester avec un champ `QuarkusExtensionTest`.
+Vérification : revue, et les tests du module de déploiement.
+
+== Images natives
+
+[[COD-209]]
+*COD-209.* Une construction native DOIT employer une image de construction Mandrel 25 épinglée par son empreinte, selon SEC-030.
+Elle DOIT employer la même version majeure du JDK que la construction sur la JVM.
+Elle DOIT fixer `quarkus.native.native-image-xmx` et l’option `--parallelism` de `native-image`.
+Vérification : revue de la configuration de construction.
+
+Le link:https://quarkus.io/guides/building-native-image[guide sur les images natives] fait de Mandrel l’outil de construction par défaut pour les conteneurs Linux.
+Depuis Quarkus 3.36, la link:https://quarkus.io/blog/mandrel-25-minimum-version/[version minimale de GraalVM et de Mandrel] est 25.0.
+Des limites explicites rendent le résultat indépendant de la taille de l’exécuteur.
+
+[[COD-210]]
+*COD-210.* Le flux de travail de publication DOIT exécuter les tests marqués `@QuarkusIntegrationTest` sur l’exécutable natif.
+Il les exécute avec `./mvnw verify -Dnative`.
+Vérification : le flux de travail de publication.
+
+C’est ainsi qu’un artefact natif respecte TST-065.
+
+[[COD-211]]
+*COD-211.* Une application DOIT produire sa nomenclature logicielle avec l’extension `quarkus-cyclonedx`.
+Vérification : le flux de travail de publication.
+
+Le link:https://quarkus.io/guides/cyclonedx[guide CycloneDX de Quarkus] fait de l’exécutable le composant principal de la nomenclature.
+La nomenclature provient alors de la construction, comme le demande SEC-034.
+Les bibliothèques et les extensions livrent des archives Java, dont le module Maven de CycloneDX produit la nomenclature.
+
+== Tests et journaux
+
+[[COD-212]]
+*COD-212.* Les tests d’une application DEVRAIENT employer Dev Services pour leurs dépendances.
+Les tests d’une bibliothèque ordinaire DEVRAIENT employer Testcontainers.
+Les tests unitaires des beans DEVRAIENT employer `@QuarkusComponentTest`.
+Vérification : revue.
+
+TST-014 interdit déjà de remplacer une vraie base de données par un substitut en mémoire.
+Les link:https://quarkus.io/guides/dev-services[Dev Services] démarrent le vrai produit dans un conteneur.
+Un link:https://quarkus.io/guides/testing-components[test de composant] ne démarre que le conteneur de beans, et non toute l’application.
+
+[[COD-213]]
+*COD-213.* Les bibliothèques et les extensions DEVRAIENT journaliser au moyen de `org.jboss.logging.Logger`.
+Seules les classes d’application PEUVENT employer `io.quarkus.logging.Log`.
+Vérification : un test ArchUnit, ou la revue.
+
+Le link:https://quarkus.io/guides/logging[guide de journalisation de Quarkus] précise que `Log` dépend d’une réécriture à la construction.
+Il déconseille `Log` dans les extensions et les dépendances externes.
+La forme de chaque enregistrement de journal suit OBS-020 et OBS-080.
+
+== Références
+
+=== Références normatives
+
+* link:https://quarkus.io/releases/[Releases], Quarkus. link:https://web.archive.org/web/20261111141822/https://quarkus.io/releases/[Copie archivée]
+* link:https://quarkus.io/guides/writing-extensions[Writing your own extension], guides de Quarkus. link:https://web.archive.org/web/20261111141748/https://quarkus.io/guides/writing-extensions/[Copie archivée]
+* link:https://quarkus.io/guides/cdi-reference[Contexts and Dependency Injection], guides de Quarkus. link:https://web.archive.org/web/20261111141800/https://quarkus.io/guides/cdi-reference/[Copie archivée]
+* link:https://quarkus.io/guides/building-native-image[Building a native executable], guides de Quarkus. link:https://web.archive.org/web/20261110031411/https://quarkus.io/guides/building-native-image/[Copie archivée]
+* link:https://quarkus.io/guides/cyclonedx[Generating and using CycloneDX SBOMs], guides de Quarkus. link:https://web.archive.org/web/20260411212020/https://quarkus.io/guides/cyclonedx[Copie archivée]
+
+=== Références informatives
+
+* link:https://quarkus.io/blog/mandrel-25-minimum-version/[Bumping the minimum officially supported GraalVM version to 25.0], blogue de Quarkus. link:https://web.archive.org/web/20260618011843/https://quarkus.io/blog/mandrel-25-minimum-version/[Copie archivée]
+* link:https://quarkus.io/guides/dev-services[Dev Services overview], guides de Quarkus. link:https://web.archive.org/web/20261111141758/https://quarkus.io/guides/dev-services/[Copie archivée]
+* link:https://quarkus.io/guides/testing-components[Testing components], guides de Quarkus. link:https://web.archive.org/web/20260617101952/https://quarkus.io/guides/testing-components[Copie archivée]
+* link:https://quarkus.io/guides/logging[Logging configuration], guides de Quarkus. link:https://web.archive.org/web/20261104131334/https://quarkus.io/guides/logging/[Copie archivée]
+
+== Historique du document
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Changement
+|0.1.0 |2026-11-18 |Première version.
+|===

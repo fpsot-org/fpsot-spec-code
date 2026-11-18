@@ -1,33 +1,28 @@
-= FPSOT specification template
+= FPSOT code specification
 
-This repository is the starting point for an FPSOT specification.
-Create a new repository from it, then replace this text.
-
-== Start a specification
-
-. Set `SPEC_PREFIX` in `.github/workflows/ci.yml` to the three-letter prefix of the requirement IDs.
-. Replace the titles in `spec/`, `docs/antora.yml`, `publiccode.yml`, `AGENTS.md`, `NOTICE` and `skill/SKILL.md`.
-. Replace the example requirement TPL-001 and the example row in `jurisdictions/baseline.yaml`.
-. List each spec page in `spec/<lang>/book.adoc`. The glossary stays the last include.
-
-Each page ends with a document history.
-Each guide page sets `:page-type:` to tutorial, how-to, reference or explanation.
-Write abbreviations and defined terms as `{abbr-…}` and `{term-…}` from the term base of `fpsot-spec-writing`.
-Write English in US spelling.
-Each page that cites outside sources ends with a References section, right before its document history.
-Each code block names its language, such as `[source,text]` or `[source,plantuml]`.
-The continuous integration writes `_fpsot-terms.adoc`, the glossaries and the comparison pages. Git ignores them.
+Rules for how FPSOT projects write, format, check and build their software.
+A pinned formatter and linter set decides each question that a tool can settle, and prose rules cover only the rest.
+Each rule names its check: a tool in continuous integration, or review.
+A common page applies to every language, and thirteen short language pages name their tools, versions, owner and review date.
+The specification gives the per-tool mechanism behind the security, version control, testing and naming specifications, and cites their rules instead of restating them.
+Version 0.1 is a draft.
 
 == Implement this spec
 
 Read the normative text in `spec/en/` or `spec/fr/`.
-Each requirement has an ID, such as `XYZ-001`.
-Check your implementation against every requirement.
+Each requirement has an ID from `COD-001` to `COD-904`.
+
+* Pin one formatter and one linter set per language, commit their settings and fail CI on a diff or an error (COD-001 to COD-005).
+* Apply the common rules: suppressions with reasons, generated code, security findings, SPDX headers, EditorConfig, declared toolchains, one build command, style editions, names in code, release files, reproducible builds and agent instructions (COD-010 to COD-023).
+* Apply the page of each language that your repository holds: Java (COD-100 to COD-114), Quarkus (COD-200 to COD-213), Kotlin (COD-300 to COD-305), Go (COD-400 to COD-407), Bash (COD-500 to COD-506), PowerShell (COD-550 to COD-558), JavaScript and TypeScript (COD-600 to COD-607), HTML and CSS (COD-650 to COD-654), SQL (COD-700 to COD-706), container files (COD-750 to COD-754), CI workflows (COD-800 to COD-806), configuration files (COD-850 to COD-852) and Python (COD-900 to COD-904).
+* Start from the files in `examples/`, and run `bash examples/test-examples.sh` to check them. It needs Python 3.11 or later and no other package.
 
 == Adopt this spec
 
-Read the guides in `docs/modules/en/pages/` or `docs/modules/fr/pages/`.
-They explain what the spec gives your organization and how to require it.
+Read the guide in `docs/modules/en/pages/index.adoc` or `docs/modules/fr/pages/index.adoc`.
+A request for proposals can require that delivered code meets this specification for the languages it uses, and that the supplier states its style edition.
+The comparison data in `jurisdictions/` shows that Canada, Québec and France set rules on publishing and licensing code, not on coding style.
+The pages `style-editions.adoc`, `overridable-rules.adoc` and `to-be-confirmed.adoc` are informative.
 
 == Layout
 
@@ -36,10 +31,13 @@ They explain what the spec gives your organization and how to require it.
 | Folder | Content
 
 | `spec/`
-| Normative text, in English and French. `book.adoc` joins the pages into one book.
+| Normative text, in English and French. `book.adoc` joins the pages into one book, published as PDF with each release.
 
 | `docs/`
 | Guides, in the Antora folder layout.
+
+| `examples/`
+| Conforming configuration files, the script that checks them and its test.
 
 | `skill/`
 | The agent skill: a short summary that cites requirement IDs.
@@ -51,7 +49,7 @@ They explain what the spec gives your organization and how to require it.
 | PlantUML sources and their rendered SVG files.
 
 | `jurisdictions/`
-| Comparison data per jurisdiction. `baseline.yaml` lists the compared requirements.
+| Comparison data: how each government handles the same topics.
 |===
 
 == License

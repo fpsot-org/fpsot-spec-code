@@ -1,0 +1,107 @@
+= Overridable rules
+include::_fpsot-terms.adoc[]
+
+This page is informative.
+It sets no rule.
+It will move to the future capability specification, which will own the contract of overrides.
+That contract covers how a system finds a replacement, and which one wins.
+
+The page shows one way to write a business rule that an adopter can replace in a Quarkus application.
+It combines patterns from the guide on writing extensions and the CDI reference of Quarkus.
+No Quarkus document names this combination as an official pattern.
+
+== The parts
+
+The pattern has three parts.
+
+. A rule module holds the interface of the rule and its default class, in plain Java.
+It imports nothing from `jakarta.*` or `io.quarkus.*`, under COD-205.
+. The runtime module of the extension exposes the default as a bean.
+That bean backs off when the application supplies another one.
+. The application replaces the default by declaring its own bean.
+
+The rule module works in any Java program.
+A test can call the default class without a container.
+
+[source,java]
+----
+package org.fpsot.example.rules;
+
+public interface IncomeLimit {
+    boolean exceeds(Household household);
+}
+
+public final class DefaultIncomeLimit implements IncomeLimit {
+    @Override
+    public boolean exceeds(Household household) {
+        return household.income().compareTo(household.limit()) > 0;
+    }
+}
+----
+
+== Expose the default
+
+The runtime module of the extension declares a producer.
+The annotation `@DefaultBean` makes the bean back off when the application supplies a bean of the same type.
+
+[source,java]
+----
+package org.fpsot.example.runtime;
+
+@Dependent
+class IncomeLimitProducer {
+    @Produces
+    @DefaultBean
+    @ApplicationScoped
+    IncomeLimit incomeLimit() {
+        return new DefaultIncomeLimit();
+    }
+}
+----
+
+The producer and its method are package-private, under COD-204.
+
+== Replace the default
+
+An application has three routes in Quarkus.
+
+* It declares its own bean of the interface type, and the default backs off.
+* It declares a bean with `@Alternative` and `@Priority`.
+Observers on the default bean keep running in that case.
+* It selects a bean at build time with `@IfBuildProperty` or `@IfBuildProfile`.
+A property set at run time has no effect on that choice.
+
+Code that needs every implementation, such as a chain of rules, can inject `@All List<T>`.
+It gets them in order of priority.
+Java's `ServiceLoader` works in a native image only when the extension registers the service with `ServiceProviderBuildItem`.
+
+== Check the boundary
+
+An ArchUnit test in the rule module proves that it imports no framework package.
+
+[source,java]
+----
+@AnalyzeClasses(packages = "org.fpsot.example.rules")
+class RuleModuleTest {
+    @ArchTest
+    static final ArchRule noFramework = noClasses()
+            .should().dependOnClassesThat()
+            .resideInAnyPackage("jakarta..", "io.quarkus..");
+}
+----
+
+== References
+
+=== Informative
+
+* link:https://quarkus.io/guides/writing-extensions[Writing your own extension], Quarkus guides. link:https://web.archive.org/web/20261111141748/https://quarkus.io/guides/writing-extensions/[Archived copy]
+* link:https://quarkus.io/guides/cdi-reference[Contexts and Dependency Injection], Quarkus guides. link:https://web.archive.org/web/20261111141800/https://quarkus.io/guides/cdi-reference/[Archived copy]
+* link:https://www.archunit.org/[ArchUnit], TNG Technology Consulting. link:https://web.archive.org/web/20261017154535/https://www.archunit.org/[Archived copy]
+
+== Document history
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Change
+|0.1.0 |2026-11-18 |First version.
+|===

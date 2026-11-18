@@ -1,0 +1,78 @@
+= Container files
+include::_fpsot-terms.adoc[]
+
+This page covers the files that build container images.
+They are gates of the supply chain more than matters of style.
+
+[cols="1,3"]
+|===
+|Owner role |Platform lead of the Working Group
+|Last reviewed |2026-11-18
+|Review by |2027-11-18
+|===
+
+== Tools of edition 2026
+
+[cols="2,1,3",options="header"]
+|===
+|Tool |Version |Role
+|hadolint |2.15.1 |Lints container files.
+|Podman and Buildah |Buildah 1.41 or later |Build images without root.
+|===
+
+== Rules
+
+[[COD-750]]
+*COD-750.* The build file of an image MUST have the name `Containerfile`.
+It MUST pass hadolint at the threshold `warning`, with a committed configuration.
+Check: link:https://github.com/hadolint/hadolint[hadolint] in {abbr-ci-first}.
+
+hadolint checks that each base image names a tag, and runs ShellCheck on each `RUN` line.
+The file `examples/.hadolint.yaml` shows a configuration.
+
+[[COD-751]]
+*COD-751.* Each `FROM` line MUST pin its image by digest, with the tag in a comment, under SEC-030.
+The build MUST use stages, so that build tools stay out of the final image.
+The last `USER` line MUST name a numeric user other than 0.
+Check: hadolint for the user, and a {abbr-ci} search for `@sha256:` on each `FROM` line.
+
+[[COD-752]]
+*COD-752.* Each image MUST carry the labels `org.opencontainers.image.source`, `org.opencontainers.image.revision`, `org.opencontainers.image.version` and `org.opencontainers.image.licenses`.
+Check: a test of the built image, such as with `podman inspect`, and review.
+
+The link:https://github.com/opencontainers/image-spec/blob/main/annotations.md[OCI image annotations] define these keys.
+
+[[COD-753]]
+*COD-753.* Each image MUST build without root, with Podman or Buildah.
+A secret that the build needs MUST come from a secret mount, never from a layer, under SEC-020.
+Check: the {abbr-ci} job builds without root, and review.
+
+The link:https://docs.podman.io/en/latest/markdown/podman-build.1.html[reference page of podman build] describes how to mount a secret.
+
+[[COD-754]]
+*COD-754.* A build SHOULD set `--source-date-epoch` to the time of the last {term-commit}, and SHOULD use `--rewrite-timestamp`.
+It SHOULD pin package repositories to a snapshot.
+Check: the release workflow rebuilds and compares, under COD-022.
+
+link:https://buildah.io/releases/2025/07/21/Buildah-version-v1.41.0.html[Buildah 1.41] added these options, and Podman passes them on.
+Logs of package managers can still hold timestamps, which is why this rule stays a SHOULD.
+
+== References
+
+=== Normative
+
+* link:https://github.com/hadolint/hadolint[hadolint], version 2.15.1, 2026-07-31. link:https://web.archive.org/web/20261103162215/https://github.com/hadolint/hadolint[Archived copy]
+* link:https://github.com/opencontainers/image-spec/blob/main/annotations.md[Annotations], Open Container Initiative image specification. link:https://web.archive.org/web/20261105193755/https://github.com/opencontainers/image-spec/blob/main/annotations.md[Archived copy]
+
+=== Informative
+
+* link:https://docs.podman.io/en/latest/markdown/podman-build.1.html[podman-build], Podman documentation. link:https://web.archive.org/web/20261021191714/https://docs.podman.io/en/latest/markdown/podman-build.1.html[Archived copy]
+* link:https://buildah.io/releases/2025/07/21/Buildah-version-v1.41.0.html[Buildah version 1.41.0], Buildah, 2025-07-21. link:https://web.archive.org/web/20260720223337/https://buildah.io/releases/2025/07/21/Buildah-version-v1.41.0.html[Archived copy]
+
+== Document history
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Change
+|0.1.0 |2026-11-18 |First version.
+|===

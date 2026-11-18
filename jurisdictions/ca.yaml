@@ -1,0 +1,22 @@
+# Comparison data. The format is defined by fpsot-spec-doc (model/jurisdiction.yaml).
+# No federal instrument sets a coding style. The rows record what the federal texts say about
+# open source, licenses and development tools. The text of ITSP.10.033 SA-15 was not read in full
+# and is to be verified. This file is informational and not legal advice.
+code: CA
+name: {en: Canada, fr: Canada}
+rows:
+  - id: COD-002
+    text: {en: "The Directive on Service and Digital sets no coding style. It asks CIOs to encourage open source and to contribute back to the communities they use.", fr: "La Directive sur les services et le numérique ne fixe aucun style de code. Elle demande aux dirigeants principaux de l’information d’encourager les logiciels libres et de contribuer aux communautés dont ils se servent."}
+    status: not-covered
+    source: {title: "Treasury Board of Canada Secretariat, Directive on Service and Digital", url: "https://www.tbs-sct.canada.ca/pol/doc-eng.aspx?id=32601", archive: "https://web.archive.org/web/20261103002505/https://www.tbs-sct.canada.ca/pol/doc-eng.aspx?id=32601"}
+    last_checked: "2026-11-17"
+  - id: COD-014
+    text: {en: "The federal guide on publishing open source code makes a license file required, and recommends MIT or Apache 2.0 among permissive licenses. It asks for no header in each file.", fr: "Le guide fédéral sur la publication de code source ouvert exige un fichier de licence, et recommande MIT ou Apache 2.0 parmi les licences permissives. Il ne demande aucun en-tête dans chaque fichier."}
+    status: looser
+    source: {title: "Government of Canada, Guide for Publishing Open Source Code", url: "https://github.com/canada-ca/open-source-logiciel-libre/blob/master/en/guides/publishing-open-source-code.md", archive: "https://web.archive.org/web/20261012063736/https://github.com/canada-ca/open-source-logiciel-libre/blob/master/en/guides/publishing-open-source-code.md"}
+    last_checked: "2026-11-17"
+  - id: COD-016
+    text: {en: "Control SA-15 of the security control catalogue asks for a documented development process that names its standards and tools. Departments choose whether to apply it. The wording is to be verified.", fr: "La mesure SA-15 du catalogue des mesures de sécurité demande un processus de développement documenté qui nomme ses normes et ses outils. Les ministères choisissent de l’appliquer ou non. Le libellé est à vérifier."}
+    status: looser
+    source: {title: "Canadian Centre for Cyber Security, ITSP.10.033, Security control catalogue", url: "https://www.cyber.gc.ca/sites/default/files/itsp.10.033-e.pdf", archive: "https://web.archive.org/web/20260418002828/https://www.cyber.gc.ca/sites/default/files/itsp.10.033-e.pdf"}
+    last_checked: "2026-11-17"

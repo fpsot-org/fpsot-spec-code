@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: Apache-2.0
+# Example for COD-401 and COD-010: golangci-lint 2.15.0, configuration format version 2.
+version: "2"
+
+linters:
+  default: standard
+  enable:
+    - bodyclose
+    - contextcheck
+    - errorlint
+    - gosec
+    - nolintlint
+    - revive
+  settings:
+    nolintlint:
+      # COD-010: each //nolint names its linter and gives a reason.
+      require-explanation: true
+      require-specific: true
+  exclusions:
+    # COD-011: generated files are excluded by path and marker, not by comments.
+    generated: strict
+
+formatters:
+  enable:
+    - gofmt
+    - goimports

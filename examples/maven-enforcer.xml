@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<!-- Example for COD-100 and COD-108: the Maven Enforcer Plugin in the build/plugins of the parent POM.
+     A runtime module of a Quarkus extension adds the bannedDependencies rule of COD-201. -->
+<plugin xmlns="http://maven.apache.org/POM/4.0.0">
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>maven-enforcer-plugin</artifactId>
+  <version>3.7.0</version>
+  <executions>
+    <execution>
+      <id>enforce</id>
+      <goals>
+        <goal>enforce</goal>
+      </goals>
+      <configuration>
+        <rules>
+          <requireMavenVersion>
+            <version>[3.10.1,)</version>
+          </requireMavenVersion>
+          <!-- Build and test on Java 25; maven.compiler.release stays 21 (COD-100). -->
+          <requireJavaVersion>
+            <version>[25,)</version>
+          </requireJavaVersion>
+          <requirePluginVersions/>
+          <dependencyConvergence/>
+          <banDynamicVersions/>
+        </rules>
+      </configuration>
+    </execution>
+  </executions>
+</plugin>

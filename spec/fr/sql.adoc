@@ -1,0 +1,105 @@
+= SQL
+include::_fpsot-terms.adoc[]
+
+Cette page vise les requêtes {abbr-sql-first} et les migrations de bases de données.
+La {abbr-fpsot-first} s’appuie sur PostgreSQL.
+
+[cols="1,3"]
+|===
+|Rôle responsable |Responsable des données du groupe de travail
+|Dernière révision |2026-11-18
+|Réviser au plus tard le |2027-11-18
+|===
+
+== Outils de l’édition 2026
+
+[cols="2,1,3",options="header"]
+|===
+|Outil |Version |Rôle
+|PostgreSQL |18, ou 17 |Exécute la base de données.
+|Flyway Community, par `quarkus-flyway` |la version de la plateforme Quarkus |Applique les migrations.
+|sqlfluff |4.5.0 |Analyse les fichiers {abbr-sql}.
+|===
+
+== Règles
+
+[[COD-700]]
+*COD-700.* Un nouveau système DOIT employer PostgreSQL 18, et PEUT employer la version 17.
+Un système NE DOIT PAS exploiter une version majeure dont la fin de vie est passée.
+Vérification : revue du déploiement et des images de conteneur.
+
+La link:https://www.postgresql.org/support/versioning/[politique de versions de PostgreSQL] prend en charge chaque version majeure pendant cinq ans.
+PostgreSQL 14 a atteint sa fin de vie le 2026-11-12.
+
+[[COD-701]]
+*COD-701.* Les migrations DOIVENT employer Flyway.
+Un projet NE DOIT PAS adopter Liquibase 5 avant qu’un examen de sa licence l’approuve.
+Vérification : revue des dépendances.
+
+link:https://www.liquibase.com/blog/liquibase-community-for-the-future-fsl[Liquibase a annoncé] le passage de son édition communautaire à la Functional Source License.
+La recherche pour cette spécification n’a pas vérifié ces conditions à la source.
+Si elle se confirme, cette licence ne conviendrait pas à une fondation qui publie son code sous Apache 2.0.
+
+[[COD-702]]
+*COD-702.* Une migration NE DOIT PAS changer une fois qu’un environnement partagé l’a appliquée.
+Chaque profil, sauf ceux des tests, DOIT régler `quarkus.flyway.clean-disabled=true`.
+En production, la migration DOIT se faire dans une tâche distincte, avant le démarrage de la nouvelle version.
+Elle NE DOIT PAS se faire au démarrage de chaque réplique.
+Vérification : Flyway valide au démarrage les migrations déjà appliquées, et revue des profils.
+
+Le link:https://quarkus.io/guides/flyway[guide de Quarkus sur Flyway] laisse `clean-disabled` à false par défaut.
+Il explique aussi pourquoi chaque réplique ne devrait pas faire la migration.
+Les manifestes Kubernetes que produit Quarkus comprennent une telle tâche.
+
+[[COD-703]]
+*COD-703.* Une migration DOIT fonctionner avec la version précédente de l’application, pour que les deux versions tournent pendant un déploiement.
+Un changement qui brise la version précédente DOIT se faire par étapes : étendre, déplacer les données, puis réduire.
+Les grandes tables DOIVENT employer `CREATE INDEX CONCURRENTLY`.
+Les nouvelles contraintes DOIVENT employer `NOT VALID`, suivi de `VALIDATE CONSTRAINT`.
+Chaque migration DOIT régler `lock_timeout`.
+Vérification : revue.
+
+Les pages sur link:https://www.postgresql.org/docs/current/sql-createindex.html[CREATE INDEX] et link:https://www.postgresql.org/docs/current/sql-altertable.html[ALTER TABLE] décrivent ces formes.
+`CREATE INDEX CONCURRENTLY` ne peut pas s’exécuter dans un bloc de transaction.
+Flyway Community n’a pas de migrations d’annulation, alors une correction avance sous forme de nouvelle migration.
+
+[[COD-704]]
+*COD-704.* Le code DOIT passer chaque valeur à une requête comme paramètre, jamais par concaténation de chaînes.
+Un nom de table ou de colonne qui vient d’une entrée DOIT correspondre à une liste d’autorisation dans le code.
+Vérification : SpotBugs avec Find Security Bugs, gosec et la revue.
+
+Ces règles bloquent l’link:https://cwe.mitre.org/data/definitions/89.html[injection SQL, CWE-89], deuxième faiblesse de la liste de 2025.
+
+[[COD-705]]
+*COD-705.* Les fichiers {abbr-sql} DOIVENT passer sqlfluff avec le dialecte `postgres` et une configuration versionnée.
+Vérification : link:https://docs.sqlfluff.com/en/stable/[sqlfluff] dans l’{abbr-ci-first}.
+
+[[COD-706]]
+*COD-706.* Les tables DEVRAIENT employer des colonnes d’identité de la forme `GENERATED ALWAYS AS IDENTITY`, plutôt que les types `serial`.
+Les instants DEVRAIENT employer `timestamptz`.
+Les colonnes DEVRAIENT être `NOT NULL`, sauf si une valeur peut manquer.
+Les noms de tables et de colonnes DOIVENT suivre NAM-010 et NAM-013.
+Vérification : revue.
+
+== Références
+
+=== Références normatives
+
+* link:https://www.postgresql.org/support/versioning/[Versioning Policy], PostgreSQL Global Development Group. link:https://web.archive.org/web/20261116175759/https://www.postgresql.org/support/versioning/[Copie archivée]
+* link:https://quarkus.io/guides/flyway[Using Flyway], Quarkus guides. link:https://web.archive.org/web/20260822081431/https://quarkus.io/guides/flyway[Copie archivée]
+* link:https://www.postgresql.org/docs/current/sql-createindex.html[CREATE INDEX], PostgreSQL 18 documentation. link:https://web.archive.org/web/20261110052901/https://www.postgresql.org/docs/current/sql-createindex.html[Copie archivée]
+* link:https://www.postgresql.org/docs/current/sql-altertable.html[ALTER TABLE], PostgreSQL 18 documentation. link:https://web.archive.org/web/20261116164002/https://www.postgresql.org/docs/current/sql-altertable.html[Copie archivée]
+* link:https://docs.sqlfluff.com/en/stable/[SQLFluff], version 4.5.0. link:https://web.archive.org/web/20261115183538/https://docs.sqlfluff.com/en/stable/[Copie archivée]
+
+=== Références informatives
+
+* link:https://www.liquibase.com/blog/liquibase-community-for-the-future-fsl[Liquibase Community for the future], Liquibase blog. link:https://web.archive.org/web/20260702192440/https://www.liquibase.com/blog/liquibase-community-for-the-future-fsl[Copie archivée]
+* link:https://cwe.mitre.org/data/definitions/89.html[CWE-89: Improper Neutralization of Special Elements used in an SQL Command], MITRE. link:https://web.archive.org/web/20261117081802/https://cwe.mitre.org/data/definitions/89.html[Copie archivée]
+
+== Historique du document
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Changement
+|0.1.0 |2026-11-18 |Première version.
+|===

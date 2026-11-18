@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0
+# Example for COD-803 and SEC-031: zizmor 1.32.0 asks for a commit hash pin on every action.
+rules:
+  unpinned-uses:
+    config:
+      policies:
+        "*": hash-pin

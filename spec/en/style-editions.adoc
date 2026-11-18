@@ -1,0 +1,59 @@
+= Style editions
+include::_fpsot-terms.adoc[]
+
+This page is informative.
+It explains style editions, under COD-018 and COD-019, and lists the editions that exist.
+
+== Why editions
+
+A new release of a formatter can change the layout of code that passed before.
+A new release of a linter can fail on code that passed before.
+If a project took each release as it came, its {abbr-ci-first} would break at random times.
+
+A style edition fixes a set of tools, their versions and their settings.
+A project chooses its edition and moves to the next one when it is ready.
+The idea comes from the style editions of Rust.
+
+== Edition 2026
+
+Edition 2026 is the first edition.
+It is the set of tools that the tables of the language pages list in version 0.1 of this specification.
+
+* xref:java.adoc[Java]: the Quarkus formatter settings, Error Prone, NullAway, SpotBugs and ArchUnit.
+* xref:kotlin.adoc[Kotlin]: ktlint with `ktlint_official`, and detekt 1.23.8.
+* xref:go.adoc[Go]: golangci-lint 2.15.0 with `gofmt` and `goimports`.
+* xref:bash.adoc[Bash]: ShellCheck 0.11.0, and shfmt 3.14.1 with an indent of 2 spaces.
+* xref:powershell.adoc[PowerShell]: PSScriptAnalyzer 1.25.0 with the settings of `examples/PSScriptAnalyzerSettings.psd1`.
+* xref:javascript.adoc[JavaScript and TypeScript]: ESLint 10, typescript-eslint 8 and Prettier 3.
+* xref:html-css.adoc[HTML and CSS]: stylelint 18 with `stylelint-config-standard` 41.
+* xref:sql.adoc[SQL]: sqlfluff 4.5 with the `postgres` dialect.
+* xref:python.adoc[Python]: Ruff 0.17.
+
+A patch release of a tool stays in the same edition, unless it changes the output on existing code.
+
+== Changes that may open the next edition
+
+These changes appear on the horizon at the date of this version.
+Each one would change the layout of existing code, or fail on it.
+
+* detekt 2.0, once it is stable.
+* TypeScript 7 for type checks, once typescript-eslint supports it.
+* A new major version of Prettier, ESLint or golangci-lint.
+* A change of the formatter settings of the Quarkus project.
+
+== Move to a new edition
+
+1. Read the change notes of the new edition.
+2. Update the versions and the settings of the tools in one branch.
+3. Run the formatters on the whole {term-repository}, and commit the result alone.
+4. Add the hash of that {term-commit} to `.git-blame-ignore-revs`, so that blame skips it.
+5. Fix the new linter findings in later commits.
+6. Update the edition named in `CONTRIBUTING.md`.
+
+== Document history
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Change
+|0.1.0 |2026-11-18 |First version.
+|===

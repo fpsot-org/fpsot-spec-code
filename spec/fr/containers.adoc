@@ -1,0 +1,80 @@
+= Fichiers de conteneur
+include::_fpsot-terms.adoc[]
+
+Cette page vise les fichiers qui construisent des images de conteneur.
+Ils relèvent de la sécurité de la chaîne d’approvisionnement plus que du style.
+
+[cols="1,3"]
+|===
+|Rôle responsable |Responsable de la plateforme du groupe de travail
+|Dernière révision |2026-11-18
+|Réviser au plus tard le |2027-11-18
+|===
+
+== Outils de l’édition 2026
+
+[cols="2,1,3",options="header"]
+|===
+|Outil |Version |Rôle
+|hadolint |2.15.1 |Analyse les fichiers de conteneur.
+|Podman et Buildah |Buildah 1.41 ou plus récente |Construisent les images sans droits root.
+|===
+
+== Règles
+
+[[COD-750]]
+*COD-750.* Le fichier de construction d’une image DOIT porter le nom `Containerfile`.
+Il DOIT passer hadolint au seuil `warning`, avec une configuration versionnée.
+Vérification : link:https://github.com/hadolint/hadolint[hadolint] dans l’{abbr-ci-first}.
+
+hadolint vérifie que chaque image de base nomme une étiquette, et passe ShellCheck sur chaque ligne `RUN`.
+Le fichier `examples/.hadolint.yaml` montre une configuration.
+
+[[COD-751]]
+*COD-751.* Chaque ligne `FROM` DOIT épingler son image par son empreinte, avec l’étiquette en commentaire, selon SEC-030.
+La construction DOIT employer des étapes, pour que les outils de construction restent hors de l’image finale.
+La dernière ligne `USER` DOIT nommer un utilisateur numérique autre que 0.
+Vérification : hadolint pour l’utilisateur, et une recherche de `@sha256:` sur chaque ligne `FROM` par l’{abbr-ci}.
+
+[[COD-752]]
+*COD-752.* Chaque image DOIT porter les étiquettes `org.opencontainers.image.source`, `org.opencontainers.image.revision`, `org.opencontainers.image.version` et `org.opencontainers.image.licenses`.
+Vérification : un test de l’image construite, par exemple avec `podman inspect`, et la revue.
+
+Les link:https://github.com/opencontainers/image-spec/blob/main/annotations.md[annotations d’image de l’OCI] définissent ces clés.
+
+[[COD-753]]
+*COD-753.* Chaque image DOIT se construire sans droits root, avec Podman ou Buildah.
+Un secret dont la construction a besoin DOIT venir d’un montage de secret, jamais d’une couche, selon SEC-020.
+Vérification : la tâche de l’{abbr-ci} construit sans droits root, et la revue.
+
+La link:https://docs.podman.io/en/latest/markdown/podman-build.1.html[page de référence de podman build] décrit comment monter un secret.
+
+[[COD-754]]
+*COD-754.* Une construction DEVRAIT régler `--source-date-epoch` à l’heure du dernier {term-commit}.
+Elle DEVRAIT employer `--rewrite-timestamp`.
+Elle DEVRAIT épingler les dépôts de paquets sur un instantané.
+Vérification : le flux de publication reconstruit et compare, selon COD-022.
+
+link:https://buildah.io/releases/2025/07/21/Buildah-version-v1.41.0.html[Buildah 1.41] a ajouté ces options, et Podman les transmet.
+Les journaux des gestionnaires de paquets peuvent encore contenir des horodatages.
+C’est pourquoi cette règle reste une recommandation.
+
+== Références
+
+=== Références normatives
+
+* link:https://github.com/hadolint/hadolint[hadolint], version 2.15.1, 2026-07-31. link:https://web.archive.org/web/20261103162215/https://github.com/hadolint/hadolint[Copie archivée]
+* link:https://github.com/opencontainers/image-spec/blob/main/annotations.md[Annotations], Open Container Initiative image specification. link:https://web.archive.org/web/20261105193755/https://github.com/opencontainers/image-spec/blob/main/annotations.md[Copie archivée]
+
+=== Références informatives
+
+* link:https://docs.podman.io/en/latest/markdown/podman-build.1.html[podman-build], Podman documentation. link:https://web.archive.org/web/20261021191714/https://docs.podman.io/en/latest/markdown/podman-build.1.html[Copie archivée]
+* link:https://buildah.io/releases/2025/07/21/Buildah-version-v1.41.0.html[Buildah version 1.41.0], Buildah, 2025-07-21. link:https://web.archive.org/web/20260720223337/https://buildah.io/releases/2025/07/21/Buildah-version-v1.41.0.html[Copie archivée]
+
+== Historique du document
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Changement
+|0.1.0 |2026-11-18 |Première version.
+|===

@@ -1,0 +1,59 @@
+= Éditions de style
+include::_fpsot-terms.adoc[]
+
+Cette page est informative.
+Elle explique les éditions de style, selon COD-018 et COD-019, et énumère les éditions qui existent.
+
+== Raison d’être des éditions
+
+Une nouvelle version d’un outil de mise en forme peut changer la disposition d’un code qui passait jusque-là.
+Une nouvelle version d’un analyseur peut échouer sur un code qui passait jusque-là.
+Si un projet adoptait chaque version dès sa sortie, son {abbr-ci-first} échouerait à des moments imprévisibles.
+
+Une édition de style fixe un ensemble d’outils, leurs versions et leurs réglages.
+Un projet choisit son édition et passe à la suivante quand il est prêt.
+L’idée vient des éditions de style de Rust.
+
+== Édition 2026
+
+L’édition 2026 est la première édition.
+Elle regroupe les outils qu’énumèrent les tableaux des pages par langage dans la version 0.1 de cette spécification.
+
+* xref:java.adoc[Java] : les réglages de mise en forme de Quarkus, Error Prone, NullAway, SpotBugs et ArchUnit.
+* xref:kotlin.adoc[Kotlin] : ktlint avec `ktlint_official`, et detekt 1.23.8.
+* xref:go.adoc[Go] : golangci-lint 2.15.0 avec `gofmt` et `goimports`.
+* xref:bash.adoc[Bash] : ShellCheck 0.11.0, et shfmt 3.14.1 avec un retrait de 2 espaces.
+* xref:powershell.adoc[PowerShell] : PSScriptAnalyzer 1.25.0 avec les réglages de `examples/PSScriptAnalyzerSettings.psd1`.
+* xref:javascript.adoc[JavaScript et TypeScript] : ESLint 10, typescript-eslint 8 et Prettier 3.
+* xref:html-css.adoc[HTML et CSS] : stylelint 18 avec `stylelint-config-standard` 41.
+* xref:sql.adoc[SQL] : sqlfluff 4.5 avec le dialecte `postgres`.
+* xref:python.adoc[Python] : Ruff 0.17.
+
+Une version corrective d’un outil reste dans la même édition, sauf si elle change le résultat sur le code existant.
+
+== Changements qui pourraient ouvrir la prochaine édition
+
+Ces changements se profilent à la date de cette version.
+Chacun changerait la disposition du code existant, ou le ferait échouer.
+
+* detekt 2.0, une fois stable.
+* TypeScript 7 pour la vérification des types, une fois que typescript-eslint le prendra en charge.
+* Une nouvelle version majeure de Prettier, d’ESLint ou de golangci-lint.
+* Un changement des réglages de mise en forme du projet Quarkus.
+
+== Passer à une nouvelle édition
+
+1. Lisez les notes de changement de la nouvelle édition.
+2. Mettez à jour les versions et les réglages des outils dans une même branche.
+3. Lancez les outils de mise en forme sur tout le {term-repository}, et archivez le résultat seul.
+4. Ajoutez l’empreinte de cet {term-commit} au fichier `.git-blame-ignore-revs`, pour que blame l’ignore.
+5. Corrigez les nouveaux constats des analyseurs dans des archivages ultérieurs.
+6. Mettez à jour l’édition nommée dans `CONTRIBUTING.md`.
+
+== Historique du document
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Changement
+|0.1.0 |2026-11-18 |Première version.
+|===

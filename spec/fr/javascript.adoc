@@ -1,0 +1,130 @@
+= JavaScript et TypeScript
+include::_fpsot-terms.adoc[]
+
+Cette page vise JavaScript et TypeScript, dans le navigateur et dans les outils Node.js.
+L’interface de la {abbr-fpsot-first} produit le {abbr-html-first} sur le serveur.
+Les scripts enrichissent donc des pages qui fonctionnent déjà.
+
+[cols="1,3"]
+|===
+|Rôle responsable |Responsable du Web du groupe de travail
+|Dernière révision |2026-11-18
+|Réviser au plus tard le |2027-05-18
+|===
+
+La révision vient après six mois, car TypeScript et son analyseur statique sont entre deux versions majeures.
+
+== Outils de l’édition 2026
+
+[cols="2,1,3",options="header"]
+|===
+|Outil |Version |Rôle
+|Node.js |26, à soutien à long terme |Exécute les outils et les constructions.
+|TypeScript |6.0.x |Vérifie les types et alimente l’analyseur statique.
+|TypeScript |7.0 |PEUT compiler, à côté de la version 6.0.
+|ESLint |10.15.0 |Analyse le code, avec la configuration plate seulement.
+|typescript-eslint |8.73.0 |Ajoute des règles qui lisent les types.
+|Prettier |3.10.1 |Met en forme le code.
+|===
+
+== Règles
+
+[[COD-600]]
+*COD-600.* Tout nouveau travail DOIT s’exécuter sur Node.js 26.
+Un projet DOIT s’exécuter seulement sur une branche de Node.js en soutien à long terme, active ou en maintenance.
+Il DOIT déclarer cette branche dans le champ `engines` de `package.json` et dans un fichier `.node-version`.
+Vérification : `npm ci`, qui avertit d’un moteur incorrect, et revue des tâches de l’{abbr-ci-first}.
+
+La link:https://nodejs.org/en/about/previous-releases[page des versions de Node.js] donne chaque branche et sa date de fin.
+À partir de Node.js 27, il paraît link:https://nodejs.org/en/blog/announcements/evolving-the-nodejs-release-schedule[une version majeure par an].
+Chacune devient une version à soutien à long terme.
+
+[[COD-601]]
+*COD-601.* Un projet DOIT vérifier les types et analyser le code avec TypeScript 6.0.x.
+Cette règle vaut tant que typescript-eslint ne prend pas en charge TypeScript 7.
+Il PEUT aussi compiler avec TypeScript 7.
+Vérification : la version de `typescript` dans le fichier de verrouillage, et la revue.
+
+link:https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/[TypeScript 7.0] est un portage natif, paru sans interface pour les autres outils.
+Les link:https://typescript-eslint.io/users/dependency-versions/[versions prises en charge par typescript-eslint] s’arrêtent avant TypeScript 6.1.
+Les règles qui lisent les types comptent plus que la vitesse du compilateur, alors l’analyseur statique l’emporte.
+Le responsable revoit cette règle quand typescript-eslint prendra en charge TypeScript 7.
+
+[[COD-602]]
+*COD-602.* Le fichier `tsconfig.json` DOIT activer `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noImplicitOverride` et `verbatimModuleSyntax`.
+Le code DOIT employer uniquement des modules ECMAScript.
+Vérification : le compilateur, et la revue de `tsconfig.json`.
+
+La link:https://www.typescriptlang.org/tsconfig/[référence TSConfig] décrit chaque option.
+Le code que Node.js exécute sans étape de construction a aussi besoin de `erasableSyntaxOnly`.
+
+[[COD-603]]
+*COD-603.* ESLint DOIT analyser le code avec une configuration plate et l’ensemble `strictTypeChecked` de typescript-eslint.
+Le plugiciel de commentaires d’ESLint DOIT activer sa règle `require-description`, selon COD-010.
+Prettier DOIT mettre en forme le code.
+Vérification : `eslint` et `prettier --check` dans l’{abbr-ci}.
+
+link:https://eslint.org/docs/latest/use/migrate-to-10.0.0[ESLint 10] ne lit plus l’ancien format de configuration.
+Les link:https://typescript-eslint.io/users/configs/[configurations partagées de typescript-eslint] comprennent `strictTypeChecked`.
+link:https://prettier.io/[Prettier] décide de la mise en page.
+Le fichier `examples/eslint.config.mjs` montre une configuration conforme.
+
+[[COD-604]]
+*COD-604.* Un projet DOIT versionner son fichier de verrouillage et installer avec `npm ci`.
+Son fichier `.npmrc` DOIT régler `ignore-scripts=true` et `allow-git=none`.
+Il DOIT aussi régler `min-release-age` à au moins 3 jours.
+Vérification : revue de `.npmrc` et des tâches de l’{abbr-ci}.
+
+Ces link:https://docs.npmjs.com/cli/v11/using-npm/config[paramètres de npm] sont le mécanisme de npm pour SEC-030 et SEC-032.
+Un délai d’attente laisse au registre le temps de retirer une version malveillante avant qu’un projet l’installe.
+
+[[COD-605]]
+*COD-605.* Un projet qui publie un paquet sur npm DOIT le publier par publication de confiance, avec sa provenance.
+Vérification : le flux de publication.
+
+La link:https://docs.npmjs.com/trusted-publishers/[publication de confiance] emploie une identité de courte durée fournie par l’{abbr-ci}, au lieu d’un jeton conservé.
+Elle ajoute la provenance d’elle-même.
+Elle sert SEC-024 et SEC-035.
+
+[[COD-606]]
+*COD-606.* Une interface DOIT produire ses pages en {abbr-html} sur le serveur, et ajouter les scripts par amélioration progressive.
+Un projet qui a besoin d’un cadriciel d’application monopage DOIT d’abord consigner cette décision, avec ses motifs.
+Vérification : revue.
+
+Le link:https://www.gov.uk/service-manual/technology/using-progressive-enhancement[GOV.UK Service Manual] explique pourquoi les pages devraient fonctionner avant le chargement des scripts.
+La pile par défaut de la {abbr-fpsot} réunit des gabarits Qute, PatternFly, HTMX et Alpine.js.
+
+[[COD-607]]
+*COD-607.* Le code DOIT garder les données à clés venues de l’extérieur dans une `Map` ou un `Set`.
+Il NE DOIT PAS employer un objet ordinaire comme dictionnaire pour de telles données.
+Il NE DOIT PAS copier des clés venues de l’extérieur dans un objet ordinaire sans liste d’autorisation.
+Vérification : revue.
+
+Cette règle suit l’exigence 15.3.6 de l’{abbr-owasp-first} {abbr-asvs-first}, qui demande au code d’empêcher la pollution de prototype.
+
+== Références
+
+=== Références normatives
+
+* link:https://nodejs.org/en/about/previous-releases[Node.js Releases], OpenJS Foundation. link:https://web.archive.org/web/20261117015043/https://nodejs.org/en/about/previous-releases[Copie archivée]
+* link:https://typescript-eslint.io/users/dependency-versions/[Dependency Versions], typescript-eslint, version 8.73.0. link:https://web.archive.org/web/20261115211741/https://typescript-eslint.io/users/dependency-versions/[Copie archivée]
+* link:https://www.typescriptlang.org/tsconfig/[TSConfig Reference], TypeScript, Microsoft. link:https://web.archive.org/web/20261113214208/https://www.typescriptlang.org/tsconfig/[Copie archivée]
+* link:https://typescript-eslint.io/users/configs/[Shared Configs], typescript-eslint. link:https://web.archive.org/web/20261104060718/https://typescript-eslint.io/users/configs/[Copie archivée]
+* link:https://docs.npmjs.com/cli/v11/using-npm/config[config], npm Docs, npm 11. link:https://web.archive.org/web/20261113114320/https://docs.npmjs.com/cli/v11/using-npm/config/[Copie archivée]
+* link:https://docs.npmjs.com/trusted-publishers/[Trusted publishing for npm packages], npm Docs. link:https://web.archive.org/web/20261106080202/https://docs.npmjs.com/trusted-publishers/[Copie archivée]
+
+=== Références informatives
+
+* link:https://nodejs.org/en/blog/announcements/evolving-the-nodejs-release-schedule[Evolving the Node.js release schedule], Node.js blog. link:https://web.archive.org/web/20261114211421/https://nodejs.org/en/blog/announcements/evolving-the-nodejs-release-schedule[Copie archivée]
+* link:https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/[Announcing TypeScript 7.0], Microsoft, 2026-07-08. link:https://web.archive.org/web/20261111145226/https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/[Copie archivée]
+* link:https://eslint.org/docs/latest/use/migrate-to-10.0.0[Migrate to v10.x], ESLint. link:https://web.archive.org/web/20261102225934/https://eslint.org/docs/latest/use/migrate-to-10.0.0[Copie archivée]
+* link:https://prettier.io/[Prettier], version 3.10.1. link:https://web.archive.org/web/20261113011542/https://prettier.io/[Copie archivée]
+* link:https://www.gov.uk/service-manual/technology/using-progressive-enhancement[Building a resilient frontend using progressive enhancement], GOV.UK Service Manual. link:https://web.archive.org/web/20261101062636/https://www.gov.uk/service-manual/technology/using-progressive-enhancement[Copie archivée]
+
+== Historique du document
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Changement
+|0.1.0 |2026-11-18 |Première version.
+|===

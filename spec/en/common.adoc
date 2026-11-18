@@ -1,0 +1,184 @@
+= Common rules
+include::_fpsot-terms.adoc[]
+
+These rules apply to every language of this specification.
+The language pages add to them and never relax them.
+
+== Suppressions and generated code
+
+[[COD-010]]
+*COD-010.* Each comment that turns off a linter finding MUST name the rule that it turns off.
+It MUST give its reason in the same comment.
+It MUST cover the smallest scope that the tool allows, such as one line rather than one file.
+Check: the `nolintlint` linter for Go, with `require-explanation` and `require-specific` on.
+The rule `require-description` of the ESLint comments plugin checks TypeScript and JavaScript, and review checks the other languages.
+
+The link:https://golangci-lint.run/docs/linters/configuration/[settings of golangci-lint] and the link:https://eslint-community.github.io/eslint-plugin-eslint-comments/rules/require-description.html[ESLint comments plugin] enforce this form.
+The research for this specification found no tool that enforces it for `@SuppressWarnings` in Java.
+
+[[COD-011]]
+*COD-011.* Generated code and copies of outside code MUST sit in paths that the tool configuration excludes.
+A team MUST NOT turn off findings in them one comment at a time.
+A generated file MUST say that a tool generated it, and nobody edits it by hand.
+Check: review of the tool configuration.
+For Go, the `exclusions.generated` setting of golangci-lint does this.
+
+[[COD-012]]
+*COD-012.* A comment alone MUST NOT turn off a high or critical finding of a security analyzer.
+Such a finding needs an exception under SEC-016, with its reason, its owner and its end date.
+The comment that turns off the finding MUST cite that exception.
+Check: review, under SEC-010.
+
+[[COD-013]]
+*COD-013.* A team MUST NOT turn off a rule of the security analyzers that the language pages name.
+COD-012 is the only exception.
+Check: review of the tool configuration.
+
+Those analyzers cover many weaknesses of the link:https://cwe.mitre.org/top25/archive/2025/2025_cwe_top25.html[2025 CWE Top 25].
+They also cover chapter V15 of the link:https://github.com/OWASP/ASVS/blob/master/5.0/en/0x24-V15-Secure-Coding-and-Architecture.md[OWASP ASVS 5.0], on secure coding.
+The table maps some of them to rules of this specification.
+It is informative.
+
+[cols="2,3,3",options="header"]
+|===
+|Weakness |Rules |Tools
+|CWE-79, cross-site scripting |COD-651, COD-652 |Qute escaping, Nu HTML Checker, review
+|CWE-89, SQL injection |COD-704 |SpotBugs with Find Security Bugs, gosec, review
+|CWE-78 and CWE-77, command injection |COD-502, COD-552, COD-904 |ShellCheck, PSScriptAnalyzer, Ruff `S` rules, gosec
+|CWE-94, code injection |COD-502, COD-552, COD-651, COD-904 |ShellCheck, PSScriptAnalyzer, Ruff `S` rules
+|CWE-22, path traversal |COD-104, COD-401 |Find Security Bugs, gosec
+|CWE-476, null pointer dereference |COD-103 |NullAway
+|CWE-502, deserialization of untrusted data |COD-106, COD-904 |Find Security Bugs, Ruff `S` rules
+|CWE-770, allocation without limits |COD-112 |review
+|===
+
+== Files and headers
+
+[[COD-014]]
+*COD-014.* Each source file MUST start with an `SPDX-License-Identifier` comment that names its license.
+A file in a format without comments, such as {abbr-json-first}, is exempt.
+Check: a {abbr-ci-first} search for the line, such as with `grep`.
+
+The link:https://spdx.dev/learn/handling-license-info/[SPDX project] describes this short form.
+A future legal specification will own the list of allowed licenses and the copyright notices.
+Until then, this rule keeps only the header.
+
+[[COD-015]]
+*COD-015.* Each {term-repository} MUST have an `.editorconfig` file at its root, with `root = true`.
+For every file, it MUST set the {abbr-utf-8-first} encoding and a final newline.
+It MUST also set the line feed as the end of each line.
+It MUST also remove trailing white space, except in Markdown and AsciiDoc files where it carries meaning.
+Check: link:https://github.com/editorconfig-checker/editorconfig-checker[editorconfig-checker] in {abbr-ci}.
+
+The link:https://editorconfig.org/[EditorConfig] format lets editors and formatters read the same settings.
+The file `examples/.editorconfig` shows one.
+
+== Toolchains and builds
+
+[[COD-016]]
+*COD-016.* Each {term-repository} MUST declare the version of each language toolchain in a file that it commits.
+The {abbr-ci} MUST read the version from that file.
+Check: review of the {abbr-ci} workflow.
+
+[cols="1,3",options="header"]
+|===
+|Language |Where the version lives
+|Java and Kotlin |`maven.compiler.release` and the `requireJavaVersion` rule of the Maven Enforcer Plugin, under COD-100 and COD-108
+|Go |the `go` and `toolchain` lines of `go.mod`, under COD-400
+|JavaScript and TypeScript |`engines` in `package.json` and the `.node-version` file, under COD-600
+|Python |`requires-python` in `pyproject.toml`, under COD-901
+|PowerShell |the `#Requires -Version` line of each script, under COD-550
+|===
+
+[[COD-017]]
+*COD-017.* A {term-repository} MUST build with one command, the same on a laptop and in {abbr-ci}.
+That command MUST use the committed wrapper or the pinned toolchain.
+Check: review of the {abbr-ci} workflow.
+
+== Style editions
+
+[[COD-018]]
+*COD-018.* Some changes of a formatter or a linter reformat existing code, or make it fail.
+This specification MUST ship each such change as a new style edition.
+A new edition comes in a minor version of this specification.
+The previous edition MUST stay conforming for at least 12 months after the new one.
+Check: review at each release of this specification.
+
+[[COD-019]]
+*COD-019.* A {term-repository} MUST state the style edition that it follows, in its `CONTRIBUTING.md` file.
+A move to a new edition MUST reformat the code in one {term-commit} that does nothing else.
+Check: review.
+
+The xref:style-editions.adoc[Style editions] page lists the tools of each edition and the steps of a move.
+The idea comes from the link:https://github.com/rust-lang/rust/blob/master/src/doc/style-guide/src/editions.md[style editions of Rust].
+A formatter change then breaks no {abbr-ci} run until the project chooses to move.
+
+== Names in code
+
+[[COD-020]]
+*COD-020.* Names inside the code, such as classes, functions and variables, MUST follow the official conventions of their language.
+The linters of each page check them.
+Some names leave the code, such as a package, a field of a message or a configuration key.
+Those names MUST follow the naming specification.
+Check: the linters of each language page, and review for names that leave the code.
+
+The naming specification sets those names under NAM-001 to NAM-023, and the fields of data under NAM-040 to NAM-043.
+
+== Releases
+
+[[COD-021]]
+*COD-021.* Each release MUST publish, next to each artifact, the files that the security specification asks for.
+They MUST use these names, so that a tool can find them.
+
+* The {abbr-sbom-first} in CycloneDX {abbr-json}, named `<artifact>.cdx.json`, under SEC-033 and SEC-034.
+* Its provenance, under SEC-035.
+* Its signature, or its line in a signed list of checksums named `SHA256SUMS`, under SEC-036.
+
+Check: the release workflow of COD-804.
+
+[[COD-022]]
+*COD-022.* The builds of Java archives and Go binaries MUST be reproducible bit for bit.
+The builds of native executables, container images and npm packages SHOULD be reproducible.
+A project MUST then list the known sources of difference in its release notes.
+Check: the release workflow rebuilds and compares, under COD-109 and COD-404.
+
+SEC-037 asks that builds be reproducible as a SHOULD.
+Maven and Go make it nearly free for archives and binaries, so this rule makes it a MUST there.
+No primary source shows that native images come out the same on each run, so they stay a SHOULD.
+
+== Agents
+
+[[COD-023]]
+*COD-023.* The `AGENTS.md` file of a {term-repository} SHOULD point to the skill file of this specification.
+It SHOULD name the languages that the {term-repository} holds.
+It SHOULD also give the commands that format, lint and test the code.
+Check: review.
+
+The link:https://agents.md/[AGENTS.md format] reads the file closest to the edited file.
+The link:https://best.openssf.org/Security-Focused-Guide-for-AI-Code-Assistant-Instructions[OpenSSF guide on instructions for code assistants] gives the security content of such a file.
+
+== References
+
+=== Normative
+
+* link:https://cwe.mitre.org/top25/archive/2025/2025_cwe_top25.html[2025 CWE Top 25 Most Dangerous Software Weaknesses], MITRE, 2025-12. link:https://web.archive.org/web/20261103161603/https://cwe.mitre.org/top25/archive/2025/2025_cwe_top25.html[Archived copy]
+* link:https://github.com/OWASP/ASVS/blob/master/5.0/en/0x24-V15-Secure-Coding-and-Architecture.md[OWASP Application Security Verification Standard 5.0.0, V15 Secure Coding and Architecture], OWASP. link:https://web.archive.org/web/20260824111028/https://github.com/OWASP/ASVS/blob/master/5.0/en/0x24-V15-Secure-Coding-and-Architecture.md[Archived copy]
+* link:https://editorconfig.org/[EditorConfig], EditorConfig team. link:https://web.archive.org/web/20261117102634/https://editorconfig.org/[Archived copy]
+* link:https://spdx.dev/learn/handling-license-info/[Handling License Info], SPDX project, Linux Foundation. link:https://web.archive.org/web/20261116203858/https://spdx.dev/learn/handling-license-info/[Archived copy]
+
+=== Informative
+
+* link:https://golangci-lint.run/docs/linters/configuration/[Linters settings], golangci-lint, version 2. link:https://web.archive.org/web/20261109231801/https://golangci-lint.run/docs/linters/configuration/[Archived copy]
+* link:https://eslint-community.github.io/eslint-plugin-eslint-comments/rules/require-description.html[eslint-comments/require-description], ESLint Community. link:https://web.archive.org/web/20260625152725/https://eslint-community.github.io/eslint-plugin-eslint-comments/rules/require-description.html[Archived copy]
+* link:https://github.com/editorconfig-checker/editorconfig-checker[editorconfig-checker], version 4.0.2, 2026-09-19. link:https://web.archive.org/web/20260819050352/https://github.com/editorconfig-checker/editorconfig-checker[Archived copy]
+* link:https://github.com/rust-lang/rust/blob/master/src/doc/style-guide/src/editions.md[Rust style editions], The Rust Style Guide. link:https://web.archive.org/web/20250520035929/https://github.com/rust-lang/rust/blob/master/src/doc/style-guide/src/editions.md[Archived copy]
+* link:https://agents.md/[AGENTS.md], open format for coding agents. link:https://web.archive.org/web/20261117200853/https://agents.md/[Archived copy]
+* link:https://best.openssf.org/Security-Focused-Guide-for-AI-Code-Assistant-Instructions[Security-Focused Guide for AI Code Assistant Instructions], Open Source Security Foundation. link:https://web.archive.org/web/20261005132941/https://best.openssf.org/Security-Focused-Guide-for-AI-Code-Assistant-Instructions[Archived copy]
+
+== Document history
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Change
+|0.1.0 |2026-11-18 |First version.
+|===

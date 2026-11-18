@@ -1,0 +1,52 @@
+= En attente de confirmation
+include::_fpsot-terms.adoc[]
+
+Cette page est informative.
+Elle ne fixe aucune règle.
+Elle énumère des orientations que la personne responsable du projet doit confirmer avant qu’elles entrent dans une page par langage.
+
+== Résolutions consignées sur Java et Go
+
+La personne responsable du projet a consigné douze résolutions de conflits entre d’anciennes orientations sur Java et Go.
+Elles préfèrent des règles propres à une version et à un cas mesuré aux règles générales.
+
+Une fois confirmée, chacune devient une recommandation de revue de la page Java ou Go.
+D’ici là, aucune ne lie un projet.
+Elles portent sur les sujets suivants.
+
+[cols="1,4",options="header"]
+|===
+|Numéros |Sujets
+|1 à 7 |Concurrence en Java : le choix entre verrous de lecture-écriture et autres verrous, l’épinglage des fils virtuels selon la version du JDK, la mise en réserve et la régulation, la taille des réserves de fils, les exécuteurs pour la répartition asynchrone, l’initialisation paresseuse et le type de verrou par défaut.
+|8 |Erreurs en Java : quand une exception devrait être vérifiée.
+|9 et 10 |Erreurs en Go : valeurs sentinelles ou types sur mesure, et enveloppement avec `%w` ou `%v`.
+|11 et 12 |Fonctions en Go : résultats nommés, et récepteurs par valeur ou par pointeur.
+|===
+
+Deux règles de cette spécification touchent aux mêmes sujets, mais reposent sur d’autres sources.
+COD-112 interdit de mettre les fils virtuels en réserve, d’après la JEP 444.
+COD-105 rend les exceptions Java non vérifiées.
+Elle suit le modèle d’erreurs que la personne responsable a approuvé pour Java et Kotlin ensemble.
+
+Cinq autres résolutions portent sur Rust et C.
+La {abbr-fpsot-first} n’emploie pas ces langages, et cette spécification les laisse donc de côté.
+
+== Faits à vérifier
+
+Ces faits pourraient changer une règle, et la recherche n’a pas pu les vérifier à une source primaire.
+
+* Si Quarkus 4.0 bénéficiera d’un soutien à long terme, selon COD-200.
+* La longueur de ligne des réglages de mise en forme de Quarkus, selon COD-102.
+* Si une image native sort identique d’une exécution à l’autre et selon les réglages de `--parallelism`, selon COD-022.
+* Les conditions de licence de Liquibase 5, selon COD-701.
+* Quand GitHub offrira à tous les fichiers de verrouillage des flux de travail, et sur quels forfaits.
+* Si SecretManagement pour PowerShell a un successeur, selon COD-558.
+* Si Kotlin signale par défaut les problèmes JSpecify comme des erreurs ou comme des avertissements, selon COD-103.
+
+== Historique du document
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Changement
+|0.1.0 |2026-11-18 |Première version.
+|===

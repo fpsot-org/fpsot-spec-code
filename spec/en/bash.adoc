@@ -1,0 +1,92 @@
+= Bash
+include::_fpsot-terms.adoc[]
+
+This page covers shell scripts.
+A short script joins tools, and a longer one becomes a Go program under COD-505.
+
+[cols="1,3"]
+|===
+|Owner role |Scripting lead of the Working Group
+|Last reviewed |2026-11-18
+|Review by |2027-11-18
+|===
+
+== Tools of edition 2026
+
+[cols="2,1,3",options="header"]
+|===
+|Tool |Version |Role
+|Bash |4.4 or later |Runs scripts on the Linux runners of {abbr-ci-first}.
+|ShellCheck |0.11.0 |Lints scripts.
+|shfmt |3.14.1 |Formats scripts.
+|bats-core |1.14.0 |Tests scripts.
+|===
+
+== Rules
+
+[[COD-500]]
+*COD-500.* An executable script MUST start with `#!/usr/bin/env bash` and target Bash 4.4 or later.
+A script MAY use POSIX `sh` only where its environment has no Bash, such as a minimal container image.
+Check: ShellCheck, which reads the shell from the first line.
+
+The link:https://google.github.io/styleguide/shellguide.html[Google Shell Style Guide] serves as the style guide of this page.
+
+[[COD-501]]
+*COD-501.* Each script MUST pass ShellCheck at its default severity.
+It MUST pass `shfmt -d` with an indent of 2 spaces, set in `.editorconfig`.
+Check: link:https://github.com/koalaman/shellcheck/releases[ShellCheck] and link:https://github.com/mvdan/sh/releases[shfmt] in {abbr-ci}.
+
+[[COD-502]]
+*COD-502.* A script MUST quote each variable and each command substitution that it expands.
+It MUST pass arguments on with `"$@"`, test with `[[ ]]` and capture output with `$( )`.
+It MUST NOT use `eval`.
+Check: ShellCheck, and review for `eval`.
+
+[[COD-503]]
+*COD-503.* A script SHOULD start with `set -Eeuo pipefail` and `shopt -s inherit_errexit`.
+It MUST still check the result of each critical command, and MUST write its errors to the standard error stream.
+Check: review.
+
+The options stop many errors, but not all of them.
+The link:https://mywiki.wooledge.org/BashFAQ/105[BashFAQ entry on errexit] lists cases where a failed command does not stop the script.
+A condition, a `local` assignment and some subshells are such cases.
+
+[[COD-504]]
+*COD-504.* A script MUST create temporary files and folders with `mktemp`, and remove them in a `trap` on `EXIT`.
+It MUST NOT use a fixed path for temporary data.
+Check: review.
+
+[[COD-505]]
+*COD-505.* A script that grows past about 100 lines MUST become a Go program, under the xref:go.adoc[Go] page.
+A script that parses structured data, such as {abbr-json-first} or {abbr-xml-first}, MUST also become one.
+Check: review.
+
+The Google guide sets the same limit.
+A Go program gets types, tests and the same linters as the other {abbr-fpsot-first} tools.
+
+[[COD-506]]
+*COD-506.* A script that other code depends on SHOULD have tests in link:https://github.com/bats-core/bats-core/releases[bats-core], run in {abbr-ci}.
+Check: review.
+
+Since version 1.14, `run` in bats honors `set -e`, which can break older tests.
+
+== References
+
+=== Normative
+
+* link:https://google.github.io/styleguide/shellguide.html[Shell Style Guide], Google. link:https://web.archive.org/web/20261103090944/https://google.github.io/styleguide/shellguide.html[Archived copy]
+* link:https://github.com/koalaman/shellcheck/releases[ShellCheck releases], version 0.11.0, 2025-08-04. link:https://web.archive.org/web/20261109145054/https://github.com/koalaman/shellcheck/releases[Archived copy]
+* link:https://github.com/mvdan/sh/releases[sh and shfmt releases], version 3.14.1, 2026-09-06. link:https://web.archive.org/web/20261021184209/https://github.com/mvdan/sh/releases[Archived copy]
+
+=== Informative
+
+* link:https://mywiki.wooledge.org/BashFAQ/105[BashFAQ/105, Why doesn't set -e do what I expected?], Greg's Wiki. link:https://web.archive.org/web/20261113202851/http://mywiki.wooledge.org/BashFAQ/105[Archived copy]
+* link:https://github.com/bats-core/bats-core/releases[bats-core releases], version 1.14.0, 2026-07-21. link:https://web.archive.org/web/20260515234319/https://github.com/bats-core/bats-core/releases[Archived copy]
+
+== Document history
+
+[cols="1,1,4",options="header"]
+|===
+|Version |Date |Change
+|0.1.0 |2026-11-18 |First version.
+|===
