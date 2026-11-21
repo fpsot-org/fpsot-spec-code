@@ -6,6 +6,12 @@ and versions follow [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.h
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-21
+
+### Changed
+
+- COD-706 cites the new SQL row of NAM-010 (naming 0.5.2) for the case of table and column names, instead of setting it here.
+
 ## [0.1.0] - 2026-11-18
 
 ### Added

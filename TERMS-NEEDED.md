@@ -151,7 +151,3 @@ The French forms marked "to confirm" have no record in the Grand dictionnaire te
     fr: {full: "publication de confiance", definition: "Publication d’un paquet depuis l’IC au moyen d’un jeton d’identité de courte durée, au lieu d’un secret conservé."}
     source: {name: "npm Docs, Trusted publishing; French form to confirm", url: "https://docs.npmjs.com/trusted-publishers/", checked: "2026-11-18"}
 ```
-
-## For other specifications
-
-- Naming: COD-706 sets snake_case for SQL table and column names until the naming specification adds a row for SQL identifiers to the table of NAM-010. That part of COD-706 then moves there.

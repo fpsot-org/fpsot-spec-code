@@ -74,12 +74,8 @@ Check: link:https://docs.sqlfluff.com/en/stable/[sqlfluff] in {abbr-ci-first}.
 [[COD-706]]
 *COD-706.* Tables SHOULD use identity columns of the form `GENERATED ALWAYS AS IDENTITY` rather than `serial` types.
 Instants SHOULD use `timestamptz`, and columns SHOULD be `NOT NULL` unless a value can be absent.
-Table and column names MUST be in snake_case.
-They MUST also meet NAM-004, NAM-009 and NAM-013.
+Table and column names MUST follow NAM-010, which gives snake_case, and MUST meet NAM-004, NAM-009 and NAM-013.
 Check: review.
-
-The naming specification has no row for {abbr-sql} identifiers yet, so this page sets their case for now.
-That part moves to the naming specification once it has such a row.
 
 == References
 
@@ -102,4 +98,5 @@ That part moves to the naming specification once it has such a row.
 |===
 |Version |Date |Change
 |0.1.0 |2026-11-18 |First version.
+|0.1.1 |2026-11-21 |COD-706 cites the new {abbr-sql} row of NAM-010 for the case of table and column names.
 |===
