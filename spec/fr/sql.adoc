@@ -103,5 +103,5 @@ Vérification : revue.
 |===
 |Version |Date |Changement
 |0.1.0 |2026-11-18 |Première version.
-|0.1.1 |2026-11-21 |COD-706 cite la nouvelle ligne {abbr-sql} de NAM-010 pour la casse des noms de tables et de colonnes.
+|0.1.1 |2026-11-22 |COD-706 cite la nouvelle ligne {abbr-sql} de NAM-010 pour la casse des noms de tables et de colonnes.
 |===
