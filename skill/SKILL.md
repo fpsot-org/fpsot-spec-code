@@ -87,7 +87,7 @@ Other specs own the outcomes: static analysis, secrets and the supply chain (SEC
 
 - PostgreSQL 18, or 17; no end-of-life major (COD-700). Flyway; no Liquibase 5 before a license review (COD-701).
 - Never change an applied migration; `quarkus.flyway.clean-disabled=true` outside tests; migrate in a separate job (COD-702). Backward-compatible migrations, expand then contract; `CREATE INDEX CONCURRENTLY`, `NOT VALID` then `VALIDATE CONSTRAINT`, `lock_timeout` (COD-703).
-- Parameters for every value; allow-list dynamic identifiers (COD-704). sqlfluff with the `postgres` dialect (COD-705). Should use identity columns, `timestamptz`, `NOT NULL`; table and column names in snake_case, meeting NAM-004, NAM-009 and NAM-013 (COD-706).
+- Parameters for every value; allow-list dynamic identifiers (COD-704). sqlfluff with the `postgres` dialect (COD-705). Should use identity columns, `timestamptz`, `NOT NULL`; table and column names in snake_case per NAM-010, meeting NAM-004, NAM-009 and NAM-013 (COD-706).
 
 ## Container files
 

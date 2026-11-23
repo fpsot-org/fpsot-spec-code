@@ -78,13 +78,9 @@ Vérification : link:https://docs.sqlfluff.com/en/stable/[sqlfluff] dans l’{ab
 *COD-706.* Les tables DEVRAIENT employer des colonnes d’identité de la forme `GENERATED ALWAYS AS IDENTITY`, plutôt que les types `serial`.
 Les instants DEVRAIENT employer `timestamptz`.
 Les colonnes DEVRAIENT être `NOT NULL`, sauf si une valeur peut manquer.
-Les noms de tables et de colonnes DOIVENT être en snake_case.
+Les noms de tables et de colonnes DOIVENT suivre NAM-010, qui donne le snake_case.
 Ils DOIVENT aussi respecter NAM-004, NAM-009 et NAM-013.
 Vérification : revue.
-
-La spécification sur le nommage n’a pas encore de ligne pour les identifiants {abbr-sql}.
-Cette page en fixe donc la casse pour l’instant.
-Cette partie passera à la spécification sur le nommage dès qu’elle aura une telle ligne.
 
 == Références
 
@@ -107,4 +103,5 @@ Cette partie passera à la spécification sur le nommage dès qu’elle aura une
 |===
 |Version |Date |Changement
 |0.1.0 |2026-11-18 |Première version.
+|0.1.1 |2026-11-22 |COD-706 cite la nouvelle ligne {abbr-sql} de NAM-010 pour la casse des noms de tables et de colonnes.
 |===
